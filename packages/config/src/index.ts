@@ -2,7 +2,6 @@
 import { readFileSync } from 'fs';
 import { parse } from 'yaml';
 import { z } from 'zod';
-import type { AgentConfig } from '@sniff-dev/shared';
 
 // Model capabilities (which features each model supports)
 // Used for validating that requested features are available on the selected model
@@ -263,14 +262,14 @@ export function loadConfig(path = 'config.yml'): Config {
 /**
  * Validate a parsed config object
  */
-export function validateConfig(config: unknown): AgentConfig {
-  return ConfigSchema.parse(config) as AgentConfig;
+export function validateConfig(config: unknown): z.infer<typeof ConfigSchema> {
+  return ConfigSchema.parse(config);
 }
 
 /**
  * Parse YAML string and validate
  */
-export function parseAndValidateConfig(yamlContent: string): AgentConfig {
+export function parseAndValidateConfig(yamlContent: string): z.infer<typeof ConfigSchema> {
   const parsed = parse(yamlContent);
   return validateConfig(parsed);
 }
