@@ -33,6 +33,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate schema and documentation
+        run: |
+          pnpm --filter @sniff-dev/config generate-schema
+          pnpm --filter @sniff-dev/config generate-docs
+
       - name: Build all packages
         run: pnpm --filter "./packages/**" build
 

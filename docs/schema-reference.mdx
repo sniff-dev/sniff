@@ -2,56 +2,54 @@
 title: Schema Reference
 description: Complete technical specification of all configuration fields
 ---
+
 <Note>
   **Auto-generated from JSON Schema**
 
-  Last updated: 2025-11-12
+Last updated: 2025-11-14
 
-  This page provides the complete technical specification of all configuration fields. For explanations and best practices, see the [Configuration](/configuration) guide.
+This page provides the complete technical specification of all configuration fields. For explanations and best practices, see the [Configuration](/configuration) guide.
+
 </Note>
 
 ### Root Configuration
 
-Field | Type | Required
--------- | -------- | --------
-`version` | `"1.0"` | ✓
-`agent` | `object` | ✓
-
+| Field     | Type     | Required |
+| --------- | -------- | -------- |
+| `version` | `"1.0"`  | ✓        |
+| `agent`   | `object` | ✓        |
 
 ### agent
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`id` | `string` | ✓ | Pattern: `^[a-z0-9-]+$`<br />Length: 1-50
-`name` | `string` | ✓ | Length: 1-100
-`description` | `string` |  | Max length: 500
-`system_prompt` | `string` | ✓ | Length: 1-10000
-`model` | `object` | ✓ | -
-
+| Field           | Type     | Required | Constraints                               |
+| --------------- | -------- | -------- | ----------------------------------------- |
+| `id`            | `string` | ✓        | Pattern: `^[a-z0-9-]+$`<br />Length: 1-50 |
+| `name`          | `string` | ✓        | Length: 1-100                             |
+| `description`   | `string` |          | Max length: 500                           |
+| `system_prompt` | `string` | ✓        | Length: 1-10000                           |
+| `model`         | `object` | ✓        | -                                         |
 
 ### agent.model
 
-Field | Type | Required
--------- | -------- | --------
-`anthropic` | `object` | ✓
-
+| Field       | Type     | Required |
+| ----------- | -------- | -------- |
+| `anthropic` | `object` | ✓        |
 
 ### agent.model.anthropic
 
-Field | Type | Required | Constraints | Default
--------- | -------- | -------- | -------- | --------
-`name` | `string` | ✓ | Min length: 1 | -
-`temperature` | `number` |  | 0 - 1 | `1`
-`max_tokens` | `integer` |  | 1 - 8192 | `4096`
-`top_p` | `number` |  | 0 - 1 | -
-`top_k` | `integer` |  | ≥ 0 | -
-`stop_sequences` | string[] |  | Max 10 items | -
-`thinking` | `object` |  | - | -
-`metadata` | `object` |  | - | -
-`tool_choice` | `object` |  | - | -
-`tools` | `array` |  | - | `[]`
-`mcp_servers` | object[] |  | - | -
-
+| Field            | Type      | Required | Constraints   | Default |
+| ---------------- | --------- | -------- | ------------- | ------- |
+| `name`           | `string`  | ✓        | Min length: 1 | -       |
+| `temperature`    | `number`  |          | 0 - 1         | `1`     |
+| `max_tokens`     | `integer` |          | 1 - 8192      | `4096`  |
+| `top_p`          | `number`  |          | 0 - 1         | -       |
+| `top_k`          | `integer` |          | ≥ 0           | -       |
+| `stop_sequences` | string[]  |          | Max 10 items  | -       |
+| `thinking`       | `object`  |          | -             | -       |
+| `metadata`       | `object`  |          | -             | -       |
+| `tool_choice`    | `object`  |          | -             | -       |
+| `tools`          | `array`   |          | -             | `[]`    |
+| `mcp_servers`    | object[]  |          | -             | -       |
 
 ### agent.model.anthropic.thinking
 
@@ -59,24 +57,22 @@ Union type with 2 variants:
 
 **`enabled` variant:**
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"enabled"` | ✓ | -
-`budget_tokens` | `integer` | ✓ | ≥ 1024
+| Field           | Type        | Required | Constraints |
+| --------------- | ----------- | -------- | ----------- |
+| `type`          | `"enabled"` | ✓        | -           |
+| `budget_tokens` | `integer`   | ✓        | ≥ 1024      |
 
 **`disabled` variant:**
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"disabled"` | ✓ | -
-
+| Field  | Type         | Required | Constraints |
+| ------ | ------------ | -------- | ----------- |
+| `type` | `"disabled"` | ✓        | -           |
 
 ### agent.model.anthropic.metadata
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`user_id` | `string` |  | Max length: 256
-
+| Field     | Type     | Required | Constraints     |
+| --------- | -------- | -------- | --------------- |
+| `user_id` | `string` |          | Max length: 256 |
 
 ### agent.model.anthropic.tool_choice
 
@@ -84,32 +80,31 @@ Union type with 4 variants:
 
 **`auto` variant:**
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"auto"` | ✓ | -
-`disable_parallel_tool_use` | `boolean` |  | -
+| Field                       | Type      | Required | Constraints |
+| --------------------------- | --------- | -------- | ----------- |
+| `type`                      | `"auto"`  | ✓        | -           |
+| `disable_parallel_tool_use` | `boolean` |          | -           |
 
 **`any` variant:**
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"any"` | ✓ | -
-`disable_parallel_tool_use` | `boolean` |  | -
+| Field                       | Type      | Required | Constraints |
+| --------------------------- | --------- | -------- | ----------- |
+| `type`                      | `"any"`   | ✓        | -           |
+| `disable_parallel_tool_use` | `boolean` |          | -           |
 
 **`tool` variant:**
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"tool"` | ✓ | -
-`name` | `string` | ✓ | -
-`disable_parallel_tool_use` | `boolean` |  | -
+| Field                       | Type      | Required | Constraints |
+| --------------------------- | --------- | -------- | ----------- |
+| `type`                      | `"tool"`  | ✓        | -           |
+| `name`                      | `string`  | ✓        | -           |
+| `disable_parallel_tool_use` | `boolean` |          | -           |
 
 **`none` variant:**
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"none"` | ✓ | -
-
+| Field  | Type     | Required | Constraints |
+| ------ | -------- | -------- | ----------- |
+| `type` | `"none"` | ✓        | -           |
 
 ### agent.model.anthropic.tools[]
 
@@ -117,77 +112,73 @@ Array items must be one of:
 
 #### web_search_20250305
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"web_search_20250305"` | ✓ | -
-`name` | `"web_search"` | ✓ | -
-`max_uses` | `integer` |  | ≥ 1
-`allowed_domains` | string[] |  | -
-`blocked_domains` | string[] |  | -
-`user_location` | `object` |  | -
-
+| Field             | Type                    | Required | Constraints |
+| ----------------- | ----------------------- | -------- | ----------- |
+| `type`            | `"web_search_20250305"` | ✓        | -           |
+| `name`            | `"web_search"`          | ✓        | -           |
+| `max_uses`        | `integer`               |          | ≥ 1         |
+| `allowed_domains` | string[]                |          | -           |
+| `blocked_domains` | string[]                |          | -           |
+| `user_location`   | `object`                |          | -           |
 
 ### agent.model.anthropic.tools[].user_location
 
-Field | Type | Required
--------- | -------- | --------
-`type` | `"approximate"` | ✓
-`city` | `string` | 
-`region` | `string` | 
-`country` | `string` | 
-`timezone` | `string` | 
+| Field      | Type            | Required |
+| ---------- | --------------- | -------- |
+| `type`     | `"approximate"` | ✓        |
+| `city`     | `string`        |
+| `region`   | `string`        |
+| `country`  | `string`        |
+| `timezone` | `string`        |
 
 #### web_fetch_20250910
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"web_fetch_20250910"` | ✓ | -
-`name` | `"web_fetch"` | ✓ | -
-`max_uses` | `integer` |  | ≥ 1
-`allowed_domains` | string[] |  | -
-`blocked_domains` | string[] |  | -
-`citations` | `object` |  | -
-`max_content_tokens` | `integer` |  | ≥ 1
-
+| Field                | Type                   | Required | Constraints |
+| -------------------- | ---------------------- | -------- | ----------- |
+| `type`               | `"web_fetch_20250910"` | ✓        | -           |
+| `name`               | `"web_fetch"`          | ✓        | -           |
+| `max_uses`           | `integer`              |          | ≥ 1         |
+| `allowed_domains`    | string[]               |          | -           |
+| `blocked_domains`    | string[]               |          | -           |
+| `citations`          | `object`               |          | -           |
+| `max_content_tokens` | `integer`              |          | ≥ 1         |
 
 ### agent.model.anthropic.tools[].citations
 
-Field | Type | Required
--------- | -------- | --------
-`enabled` | `boolean` | ✓
-
+| Field     | Type      | Required |
+| --------- | --------- | -------- |
+| `enabled` | `boolean` | ✓        |
 
 ### agent.model.anthropic.mcp_servers[]
 
-Field | Type | Required | Constraints
--------- | -------- | -------- | --------
-`type` | `"url"` | ✓ | -
-`url` | `string` | ✓ | Format: uri
-`name` | `string` | ✓ | Length: 1-100
-`tool_configuration` | `object` |  | -
-
+| Field                | Type     | Required | Constraints   |
+| -------------------- | -------- | -------- | ------------- |
+| `type`               | `"url"`  | ✓        | -             |
+| `url`                | `string` | ✓        | Format: uri   |
+| `name`               | `string` | ✓        | Length: 1-100 |
+| `tool_configuration` | `object` |          | -             |
 
 ### agent.model.anthropic.mcp_servers[].tool_configuration
 
-Field | Type | Required
--------- | -------- | --------
-`enabled` | `boolean` | 
-`allowed_tools` | string[] | 
-`disabled_tools` | string[] | 
+| Field            | Type      | Required |
+| ---------------- | --------- | -------- |
+| `enabled`        | `boolean` |
+| `allowed_tools`  | string[]  |
+| `disabled_tools` | string[]  |
 
 ### Supported Claude Models
 
 Models and their supported features:
 
-| Model Name | web_search | web_fetch | thinking | mcp |
-| --- | --- | --- | --- | --- |
-| `claude-sonnet-4-5-20250929` | ✓ | ✓ | ✓ | ✓ |
-| `claude-opus-4-1-20250805` | ✓ | ✓ | ✓ | ✓ |
-| `claude-haiku-4-5-20251001` | ✓ | ✓ |  | ✓ |
-| `claude-3-7-sonnet-20250219` | ✓ | ✓ | ✓ | ✓ |
-| `claude-sonnet-4-20250514` | ✓ | ✓ | ✓ | ✓ |
-| `claude-3-5-sonnet-20241022` |  |  | ✓ | ✓ |
-| `claude-3-5-haiku-20241022` |  |  |  | ✓ |
+| Model Name                   | web_search | web_fetch | thinking | mcp |
+| ---------------------------- | ---------- | --------- | -------- | --- |
+| `claude-sonnet-4-5-20250929` | ✓          | ✓         | ✓        | ✓   |
+| `claude-opus-4-1-20250805`   | ✓          | ✓         | ✓        | ✓   |
+| `claude-haiku-4-5-20251001`  | ✓          | ✓         |          | ✓   |
+| `claude-3-7-sonnet-20250219` | ✓          | ✓         | ✓        | ✓   |
+| `claude-sonnet-4-20250514`   | ✓          | ✓         | ✓        | ✓   |
+| `claude-3-5-sonnet-20241022` |            |           | ✓        | ✓   |
+| `claude-3-5-haiku-20241022`  |            |           |          | ✓   |
 
 ### Cross-Field Validation Rules
 
@@ -212,6 +203,7 @@ The following validation rules apply across multiple fields:
 ### Additional Properties
 
 All objects in the configuration use `additionalProperties: false`, meaning:
+
 - No extra fields are allowed beyond those specified
 - Typos in field names will cause validation errors
 - This ensures configuration correctness and catches common mistakes
