@@ -20,6 +20,9 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "test": "tsx test/unit/env-vars.test.ts && tsx test/unit/config-loading.test.ts",
+    "test:env": "tsx test/unit/env-vars.test.ts",
+    "test:config": "tsx test/unit/config-loading.test.ts",
     "generate-schema": "tsx scripts/generate-schema.ts",
     "generate-docs": "tsx scripts/generate-docs.ts"
   },
