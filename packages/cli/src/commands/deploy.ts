@@ -93,7 +93,7 @@ export const deploy = new Command('deploy')
 
       if ((error as any).name === 'ZodError') {
         console.error(chalk.red('\n✗ Invalid configuration:'));
-        (error as any).errors.forEach((err: any) => {
+        (error as any).issues.forEach((err: any) => {
           console.error(chalk.gray('  •'), `${err.path.join('.')}: ${err.message}`);
         });
       } else {
