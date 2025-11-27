@@ -340,12 +340,12 @@ class SchemaParser {
     this.lines.push(this.generateTable(rootProps, false, false));
     this.lines.push('');
 
-    // Document agent object
-    const agentSchema = this.schema.properties.agent;
-    if (!agentSchema) {
-      throw new Error('Could not find agent schema in root properties');
+    // Document agents array item schema
+    const agentsSchema = this.schema.properties.agents;
+    if (!agentsSchema?.items) {
+      throw new Error('Could not find agents array schema in root properties');
     }
-    this.documentObject('agent', agentSchema);
+    this.documentObject('agents[]', agentsSchema.items as JSONSchema);
 
     // Generate model capabilities table
     this.lines.push('### Supported Claude Models');

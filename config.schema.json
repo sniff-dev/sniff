@@ -2,18 +2,16 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sniff.dev/schemas/config.schema.json",
   "title": "Sniff Agent Configuration",
-  "description": "Schema for Sniff agent configuration file (sniff.yml) version 1.0",
+  "description": "Schema for Sniff agent configuration file (config.yml) version 1.0",
   "type": "object",
   "properties": {
     "version": {
       "type": "string",
-      "const": "1.0",
-      "description": "Configuration schema version"
+      "const": "1.0"
     },
     "agents": {
-      "type": "array",
       "minItems": 1,
-      "description": "Array of agent definitions",
+      "type": "array",
       "items": {
         "type": "object",
         "properties": {
@@ -21,74 +19,62 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 50,
-            "pattern": "^[a-z0-9-]+$",
-            "description": "Unique identifier for the agent"
+            "pattern": "^[a-z0-9-]+$"
           },
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100,
-            "description": "Human-readable display name"
+            "maxLength": 100
           },
           "description": {
             "type": "string",
-            "maxLength": 500,
-            "description": "Brief description of the agent's purpose"
+            "maxLength": 500
           },
           "system_prompt": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 50000,
-            "description": "Core instructions that define how the agent thinks and responds"
+            "maxLength": 50000
           },
           "model": {
             "type": "object",
-            "description": "Model configuration (currently only Anthropic supported)",
             "properties": {
               "anthropic": {
                 "type": "object",
-                "description": "Anthropic Claude model configuration",
                 "properties": {
                   "name": {
-                    "type": "string",
                     "default": "claude-sonnet-4-20250514",
-                    "description": "The Claude model to use"
+                    "type": "string"
                   },
                   "temperature": {
+                    "default": 1,
                     "type": "number",
                     "minimum": 0,
-                    "maximum": 1,
-                    "default": 1,
-                    "description": "Controls randomness (0-1)"
+                    "maximum": 1
                   },
                   "max_tokens": {
+                    "default": 4096,
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 8192,
-                    "default": 4096,
-                    "description": "Maximum tokens for the response"
+                    "maximum": 8192
                   },
                   "top_p": {
                     "type": "number",
                     "minimum": 0,
-                    "maximum": 1,
-                    "description": "Nucleus sampling parameter"
+                    "maximum": 1
                   },
                   "top_k": {
                     "type": "integer",
                     "minimum": 0,
-                    "description": "Top-k sampling parameter"
+                    "maximum": 9007199254740991
                   },
                   "stop_sequences": {
-                    "type": "array",
                     "maxItems": 10,
+                    "type": "array",
                     "items": {
                       "type": "string"
-                    },
-                    "description": "Custom stop sequences"
+                    }
                   },
                   "thinking": {
-                    "description": "Extended thinking configuration",
                     "oneOf": [
                       {
                         "type": "object",
@@ -100,7 +86,7 @@
                           "budget_tokens": {
                             "type": "integer",
                             "minimum": 1024,
-                            "description": "Token budget for thinking"
+                            "maximum": 9007199254740991
                           }
                         },
                         "required": ["type", "budget_tokens"],
@@ -124,15 +110,13 @@
                     "properties": {
                       "user_id": {
                         "type": "string",
-                        "maxLength": 256,
-                        "description": "Opaque user identifier for tracking"
+                        "maxLength": 256
                       }
                     },
                     "additionalProperties": false
                   },
                   "tool_choice": {
-                    "description": "Controls how the model uses tools",
-                    "oneOf": [
+                    "anyOf": [
                       {
                         "type": "object",
                         "properties": {
@@ -169,8 +153,7 @@
                             "const": "tool"
                           },
                           "name": {
-                            "type": "string",
-                            "description": "Name of the specific tool to use"
+                            "type": "string"
                           },
                           "disable_parallel_tool_use": {
                             "type": "boolean"
@@ -194,12 +177,10 @@
                   },
                   "tools": {
                     "type": "array",
-                    "description": "Server-side tools the agent can use",
                     "items": {
                       "oneOf": [
                         {
                           "type": "object",
-                          "description": "Web Search Tool",
                           "properties": {
                             "type": {
                               "type": "string",
@@ -212,25 +193,22 @@
                             "max_uses": {
                               "type": "integer",
                               "minimum": 1,
-                              "description": "Maximum searches per conversation"
+                              "maximum": 9007199254740991
                             },
                             "allowed_domains": {
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              },
-                              "description": "Only include results from these domains"
+                              }
                             },
                             "blocked_domains": {
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              },
-                              "description": "Exclude results from these domains"
+                              }
                             },
                             "user_location": {
                               "type": "object",
-                              "description": "Localize search results",
                               "properties": {
                                 "type": {
                                   "type": "string",
@@ -258,7 +236,6 @@
                         },
                         {
                           "type": "object",
-                          "description": "Web Fetch Tool",
                           "properties": {
                             "type": {
                               "type": "string",
@@ -271,21 +248,19 @@
                             "max_uses": {
                               "type": "integer",
                               "minimum": 1,
-                              "description": "Maximum fetches per conversation"
+                              "maximum": 9007199254740991
                             },
                             "allowed_domains": {
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              },
-                              "description": "Only fetch from these domains"
+                              }
                             },
                             "blocked_domains": {
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              },
-                              "description": "Never fetch from these domains"
+                              }
                             },
                             "citations": {
                               "type": "object",
@@ -300,7 +275,7 @@
                             "max_content_tokens": {
                               "type": "integer",
                               "minimum": 1,
-                              "description": "Maximum content size to retrieve"
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": ["type", "name"],
@@ -311,7 +286,6 @@
                   },
                   "mcp_servers": {
                     "type": "array",
-                    "description": "MCP servers for external integrations",
                     "items": {
                       "type": "object",
                       "properties": {
@@ -321,18 +295,15 @@
                         },
                         "url": {
                           "type": "string",
-                          "format": "uri",
-                          "description": "URL of the MCP server endpoint"
+                          "format": "uri"
                         },
                         "name": {
                           "type": "string",
                           "minLength": 1,
-                          "maxLength": 100,
-                          "description": "Human-readable name for the MCP server"
+                          "maxLength": 100
                         },
                         "authorization_token": {
-                          "type": "string",
-                          "description": "Bearer token for authentication (use env var interpolation)"
+                          "type": "string"
                         },
                         "tool_configuration": {
                           "type": "object",
@@ -344,15 +315,13 @@
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              },
-                              "description": "Only enable these tools"
+                              }
                             },
                             "disabled_tools": {
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              },
-                              "description": "Disable these tools"
+                              }
                             }
                           },
                           "additionalProperties": false
@@ -363,6 +332,7 @@
                     }
                   }
                 },
+                "required": ["name", "temperature", "max_tokens"],
                 "additionalProperties": false
               }
             },
@@ -380,56 +350,79 @@
   "examples": [
     {
       "version": "1.0",
-      "agents": [
-        {
-          "id": "triage-bot",
-          "name": "Triage Assistant",
-          "system_prompt": "You are a triage specialist.\nClassify issues as BUG/FEATURE/QUESTION/TASK.\nSet priority P0-P3.",
-          "model": {
-            "anthropic": {
-              "name": "claude-sonnet-4-20250514",
-              "temperature": 0.7,
-              "max_tokens": 4096
-            }
+      "agent": {
+        "id": "triage-bot",
+        "name": "Triage Assistant",
+        "system_prompt": "You are a triage specialist.\nClassify issues as BUG/FEATURE/QUESTION/TASK.\nSet priority P0-P3.",
+        "model": {
+          "anthropic": {
+            "name": "claude-3-5-sonnet-20241022",
+            "temperature": 1,
+            "max_tokens": 4096
           }
         }
-      ]
+      }
     },
     {
       "version": "1.0",
-      "agents": [
-        {
-          "id": "research-bot",
-          "name": "Research Assistant",
-          "description": "AI agent that can search the web for information",
-          "system_prompt": "You are a research assistant.\nUse web search to find relevant information.\nAlways cite your sources.",
-          "model": {
-            "anthropic": {
-              "name": "claude-sonnet-4-20250514",
-              "temperature": 0.7,
-              "max_tokens": 4096,
-              "tool_choice": {
-                "type": "auto"
+      "agent": {
+        "id": "docs-search-agent",
+        "name": "Documentation Oracle",
+        "description": "Searches documentation to answer questions with precision and context",
+        "system_prompt": "You are a Documentation Oracle that helps users find answers in documentation.",
+        "model": {
+          "anthropic": {
+            "name": "claude-sonnet-4-5-20250929",
+            "temperature": 0.5,
+            "max_tokens": 3000,
+            "tool_choice": {
+              "type": "auto"
+            },
+            "tools": [
+              {
+                "type": "web_search_20250305",
+                "name": "web_search",
+                "max_uses": 10
               },
-              "tools": [
-                {
-                  "type": "web_search_20250305",
-                  "name": "web_search",
-                  "max_uses": 5
-                },
-                {
-                  "type": "web_fetch_20250910",
-                  "name": "web_fetch",
-                  "max_uses": 10,
-                  "citations": {
-                    "enabled": true
-                  }
+              {
+                "type": "web_fetch_20250910",
+                "name": "web_fetch",
+                "max_uses": 20,
+                "citations": {
+                  "enabled": true
                 }
-              ]
-            }
+              }
+            ]
           }
         }
-      ]
+      }
+    },
+    {
+      "version": "1.0",
+      "agent": {
+        "id": "linear-assistant",
+        "name": "Linear Assistant",
+        "description": "Helps manage and query Linear issues using MCP integration",
+        "system_prompt": "You are a helpful assistant that can search and retrieve Linear issues.\nUse the available tools to help users find information about their issues.",
+        "model": {
+          "anthropic": {
+            "name": "claude-sonnet-4-5-20250929",
+            "temperature": 0.7,
+            "max_tokens": 4000,
+            "mcp_servers": [
+              {
+                "type": "url",
+                "url": "https://api.sniff.to/mcp/linear",
+                "name": "Linear Integration",
+                "tool_configuration": {
+                  "enabled": true,
+                  "allowed_tools": ["get_issue", "search_issues"]
+                }
+              }
+            ]
+          }
+        }
+      }
     }
   ]
 }

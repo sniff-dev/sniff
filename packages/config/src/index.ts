@@ -130,6 +130,19 @@ export const ConfigSchema = z.object({
 
 export type Config = z.infer<typeof ConfigSchema>;
 
+// Model capabilities (which features each model supports)
+// Used for validating that requested features are available on the selected model
+// Anthropic's API will reject invalid model names, so we don't validate model names here
+export const MODEL_CAPABILITIES: Record<string, string[]> = {
+  'claude-sonnet-4-5-20250929': ['web_search', 'web_fetch', 'thinking', 'mcp'],
+  'claude-opus-4-1-20250805': ['web_search', 'web_fetch', 'thinking', 'mcp'],
+  'claude-haiku-4-5-20251001': ['web_search', 'web_fetch', 'mcp'],
+  'claude-3-7-sonnet-20250219': ['web_search', 'web_fetch', 'thinking', 'mcp'],
+  'claude-sonnet-4-20250514': ['web_search', 'web_fetch', 'thinking', 'mcp'],
+  'claude-3-5-sonnet-20241022': ['thinking', 'mcp'], // Older model, no server tools
+  'claude-3-5-haiku-20241022': ['mcp'], // Older model, no server tools or thinking
+};
+
 /**
  * Interpolate environment variables in YAML content
  * Supports syntax: ${VAR_NAME} and ${VAR_NAME:-default_value}
