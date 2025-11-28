@@ -2,12 +2,12 @@
  * Server Startup
  *
  * Entry point for running the Sniff server.
- * Loads config, initializes platforms and LLM, and starts the server.
+ * Loads config, initializes Linear and LLM, and starts the server.
  */
 
 import { loadConfig } from '@sniff-dev/config';
 import { createSniffServer, type SniffServerConfig } from './index.js';
-import { LinearPlatform, type Platform } from '../platforms/index.js';
+import { LinearPlatform } from '../platforms/index.js';
 import { createAnthropicClient } from '../llm/anthropic.js';
 import type { AgentConfig } from '../agent/runner.js';
 
@@ -18,8 +18,6 @@ export interface StartServerOptions {
 
 /**
  * Start the Sniff server
- *
- * Reads configuration from YAML file and credentials from environment variables.
  */
 export async function startServer(options: StartServerOptions = {}): Promise<void> {
   const configPath = options.configPath ?? 'sniff.yml';
@@ -34,7 +32,6 @@ export async function startServer(options: StartServerOptions = {}): Promise<voi
   const linearWebhookSecret = process.env.LINEAR_WEBHOOK_SECRET;
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
-  // Validate required credentials
   if (!anthropicKey) {
     throw new Error('Missing required environment variable: ANTHROPIC_API_KEY');
   }
@@ -45,13 +42,11 @@ export async function startServer(options: StartServerOptions = {}): Promise<voi
 
   // Initialize Linear platform
   console.log('Initializing Linear platform...');
-  const platforms: Platform[] = [];
-  const linearPlatform = new LinearPlatform();
-  linearPlatform.initialize({
+  const platform = new LinearPlatform();
+  platform.initialize({
     accessToken: linearToken,
     webhookSecret: linearWebhookSecret || undefined,
   });
-  platforms.push(linearPlatform);
   console.log('Linear platform initialized');
 
   // Initialize LLM client
@@ -76,13 +71,13 @@ export async function startServer(options: StartServerOptions = {}): Promise<voi
     },
   }));
 
-  // Determine port: options > PORT env var > default 3000
+  // Determine port
   const port = options.port ?? (process.env.PORT ? parseInt(process.env.PORT, 10) : 3000);
 
-  // Create server
+  // Create and start server
   const serverConfig: SniffServerConfig = {
     port,
-    platforms,
+    platform,
     agents,
     llmClient,
   };
@@ -99,7 +94,6 @@ export async function startServer(options: StartServerOptions = {}): Promise<voi
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
-  // Start server
   console.log('\nStarting Sniff server...\n');
   await server.start();
 
@@ -108,9 +102,6 @@ export async function startServer(options: StartServerOptions = {}): Promise<voi
   for (const agent of agents) {
     console.log(`  - ${agent.name} (${agent.id})`);
   }
-  console.log('\nWebhooks:');
-  for (const platform of platforms) {
-    console.log(`  - POST http://localhost:${port}/webhook/${platform.name}`);
-  }
+  console.log(`\nWebhook: POST http://localhost:${port}/webhook/linear`);
   console.log('\nPress Ctrl+C to stop');
 }

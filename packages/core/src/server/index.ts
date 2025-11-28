@@ -2,20 +2,22 @@
  * Sniff Server
  *
  * A simple headless server that:
- * - Receives webhooks from platforms
+ * - Receives webhooks from Linear
  * - Routes them to the appropriate agent
  * - Executes agents using the LLM
- * - Sends responses back via the platform
+ * - Sends responses back via Linear
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import type { Platform, PlatformEvent } from '../platforms/index.js';
+import type { Platform } from '../platforms/platform.js';
+import { getAgentSessionId } from '../platforms/types.js';
 import type { AnthropicClient } from '../llm/anthropic.js';
 import { runAgent, type AgentConfig } from '../agent/runner.js';
+import type { LinearWebhook } from '@usepolvo/linear';
 
 export interface SniffServerConfig {
   port: number;
-  platforms: Platform[];
+  platform: Platform;
   agents: AgentConfig[];
   llmClient: AnthropicClient;
 }
@@ -29,15 +31,8 @@ export interface SniffServer {
  * Create a Sniff server instance
  */
 export function createSniffServer(config: SniffServerConfig): SniffServer {
-  const { port, platforms, agents, llmClient } = config;
+  const { port, platform, agents, llmClient } = config;
 
-  // Create platform lookup map
-  const platformMap = new Map<string, Platform>();
-  for (const platform of platforms) {
-    platformMap.set(platform.name, platform);
-  }
-
-  // Create HTTP server
   const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     // Health check
     if (req.method === 'GET' && req.url === '/health') {
@@ -46,21 +41,11 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
       return;
     }
 
-    // Webhook endpoints: /webhook/:platform
-    if (req.method === 'POST' && req.url?.startsWith('/webhook/')) {
-      const platformName = req.url.replace('/webhook/', '');
-      const platform = platformMap.get(platformName);
-
-      if (!platform) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: `Unknown platform: ${platformName}` }));
-        return;
-      }
-
+    // Webhook endpoint
+    if (req.method === 'POST' && req.url === '/webhook/linear') {
       try {
-        // Read request body
         const body = await readBody(req);
-        const signature = (req.headers['x-linear-signature'] as string) || '';
+        const signature = (req.headers['linear-signature'] as string) || '';
 
         // Verify webhook
         if (!platform.verifyWebhook(body, signature)) {
@@ -71,24 +56,23 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
 
         // Parse webhook
         const payload = JSON.parse(body);
-        const event = platform.parseWebhookEvent(payload);
+        const webhook = platform.parseWebhook(payload);
 
-        if (!event) {
-          // Event should be ignored
+        if (!webhook) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ status: 'ignored' }));
           return;
         }
 
-        // Check if we should process this event
-        if (!platform.shouldProcessEvent(event)) {
+        // Check if we should process
+        if (!platform.shouldProcess(webhook)) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ status: 'skipped' }));
           return;
         }
 
-        // Find matching agent
-        const agent = findAgentForEvent(agents, event);
+        // Find agent
+        const agent = findAgent(agents, webhook);
         if (!agent) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ status: 'no_matching_agent' }));
@@ -99,10 +83,16 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'processing' }));
 
-        // Run agent asynchronously
-        const sessionId = generateSessionId();
+        // Get session ID from webhook
+        const sessionId = getAgentSessionId(webhook);
+        if (!sessionId) {
+          console.error('No agent session ID in webhook');
+          return;
+        }
+
+        // Run agent
         runAgent({
-          event,
+          webhook,
           config: agent,
           platform,
           llmClient,
@@ -119,7 +109,7 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
       return;
     }
 
-    // 404 for unknown routes
+    // 404
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Not found' }));
   });
@@ -129,10 +119,7 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
       new Promise((resolve) => {
         server.listen(port, () => {
           console.log(`Sniff server listening on port ${port}`);
-          console.log(`Webhook endpoints:`);
-          for (const platform of platforms) {
-            console.log(`  - POST /webhook/${platform.name}`);
-          }
+          console.log(`Webhook endpoint: POST /webhook/linear`);
           resolve();
         });
       }),
@@ -147,9 +134,6 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
   };
 }
 
-/**
- * Read request body as string
- */
 function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -159,21 +143,10 @@ function readBody(req: IncomingMessage): Promise<string> {
   });
 }
 
-/**
- * Find an agent that should handle this event
- * For now, returns the first agent. Can be extended with filtering logic.
- */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function findAgentForEvent(agents: AgentConfig[], event: PlatformEvent): AgentConfig | null {
-  // TODO: Add filtering based on event type, labels, team, etc.
+function findAgent(agents: AgentConfig[], webhook: LinearWebhook): AgentConfig | null {
+  // TODO: Add filtering based on webhook data
   return agents[0] || null;
-}
-
-/**
- * Generate a unique session ID
- */
-function generateSessionId(): string {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
 // Export startServer
