@@ -119,6 +119,19 @@ export function createTokenStorage(id?: string): PostgresTokenStorage {
   return new PostgresTokenStorage(id);
 }
 
+/**
+ * Clear all tokens (for OAuth revocation webhook in single-tenant mode)
+ */
+export async function clearAllTokens(): Promise<void> {
+  await initDatabase();
+  const client = await getPool().connect();
+  try {
+    await client.query('DELETE FROM tokens');
+  } finally {
+    client.release();
+  }
+}
+
 // Re-export database utilities and config storage
 export { initDatabase, closeDatabase } from './db.js';
 export { createConfigStorage, type ConfigStorage } from './config.js';

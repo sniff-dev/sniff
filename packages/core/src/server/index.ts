@@ -180,13 +180,6 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
 
     // Webhook endpoint
     if (req.method === 'POST' && req.url === '/webhook/linear') {
-      // Check if LLM client is configured
-      if (!llmClient) {
-        res.writeHead(503, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Server not configured. Set ANTHROPIC_API_KEY.' }));
-        return;
-      }
-
       try {
         const body = await readBody(req);
         const signature = (req.headers['linear-signature'] as string) || '';
@@ -200,6 +193,24 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
 
         // Parse webhook
         const payload = JSON.parse(body);
+
+        // Handle OAuth revocation
+        if (payload.type === 'AppUserAuthorization' && payload.action === 'remove') {
+          const { clearAllTokens } = await import('../storage/index.js');
+          await clearAllTokens();
+          console.log('OAuth access revoked');
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ status: 'revoked' }));
+          return;
+        }
+
+        // Check if LLM client is configured (required for agent webhooks)
+        if (!llmClient) {
+          res.writeHead(503, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Server not configured. Set ANTHROPIC_API_KEY.' }));
+          return;
+        }
+
         const webhook = platform.parseWebhook(payload);
 
         if (!webhook) {
