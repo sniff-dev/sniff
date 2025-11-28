@@ -92,6 +92,20 @@ export function createSniffServer(config: SniffServerConfig): SniffServer {
       return;
     }
 
+    // API: Check auth status (for CLI polling)
+    if (req.method === 'GET' && req.url === '/api/auth/status') {
+      const { createTokenStorage } = await import('../storage/index.js');
+      const storage = createTokenStorage();
+      try {
+        const tokens = await storage.get();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ authenticated: !!tokens?.accessToken }));
+      } finally {
+        storage.close();
+      }
+      return;
+    }
+
     // API: Get status
     if (req.method === 'GET' && req.url === '/api/status') {
       if (!checkApiAuth(req, res, apiKey)) return;

@@ -65,6 +65,27 @@ export const auth = new Command('auth').description('Authenticate with Linear').
       const authUrl = `${serverUrl}/auth/linear`;
       console.log(chalk.cyan(authUrl) + '\n');
       openBrowser(authUrl);
+
+      // Poll server to confirm auth completed
+      const spinner = ora('Waiting for authorization...').start();
+      const maxAttempts = 60; // 2 minutes
+      for (let i = 0; i < maxAttempts; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        try {
+          const res = await fetch(`${serverUrl}/api/auth/status`);
+          if (res.ok) {
+            const data = (await res.json()) as { authenticated: boolean };
+            if (data.authenticated) {
+              spinner.succeed('Authenticated with Linear');
+              return;
+            }
+          }
+        } catch {
+          // Server not reachable, keep polling
+        }
+      }
+      spinner.fail('Timed out waiting for authorization');
+      process.exit(1);
     }
   }),
 );
