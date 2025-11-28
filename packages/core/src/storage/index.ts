@@ -132,6 +132,20 @@ export async function clearAllTokens(): Promise<void> {
   }
 }
 
+/**
+ * Check if any token exists (for auth status polling)
+ */
+export async function hasToken(): Promise<boolean> {
+  await initDatabase();
+  const client = await getPool().connect();
+  try {
+    const result = await client.query('SELECT 1 FROM tokens LIMIT 1');
+    return result.rows.length > 0;
+  } finally {
+    client.release();
+  }
+}
+
 // Re-export database utilities and config storage
 export { initDatabase, closeDatabase } from './db.js';
 export { createConfigStorage, type ConfigStorage } from './config.js';
