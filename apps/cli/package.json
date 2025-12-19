@@ -1,6 +1,6 @@
 {
   "name": "@sniff/cli",
-  "version": "0.1.0",
+  "version": "1.18.0",
   "license": "MIT",
   "author": "Sniff <hello@sniff.to>",
   "description": "CLI for Sniff - local-first AI agents for Linear",
