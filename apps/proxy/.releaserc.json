@@ -1,26 +1,32 @@
 {
   "tagFormat": "proxy-v${version}",
-  "branches": ["main"],
+  "branches": [
+    "main"
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     [
-      "@semantic-release/npm",
+      "@semantic-release/exec",
       {
-        "npmPublish": false
+        "prepareCmd": "node -e \"const p=require('./package.json');p.version='${nextRelease.version}';require('fs').writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n')\""
       }
     ],
     [
       "@semantic-release/git",
       {
-        "assets": ["package.json"],
+        "assets": [
+          "package.json"
+        ],
         "message": "chore(release): proxy-v${nextRelease.version}"
       }
     ],
     [
       "@semantic-release/github",
       {
-        "releasedLabels": ["released"]
+        "releasedLabels": [
+          "released"
+        ]
       }
     ]
   ]
