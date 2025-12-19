@@ -30,15 +30,6 @@ export const authCommand = new Command('auth')
 
     // Get env config
     const env = getEnvConfig()
-    const proxyUrl = env.proxyUrl
-
-    if (!proxyUrl) {
-      console.error('SNIFF_PROXY_URL is not set.')
-      console.error('Set it in your .env file or environment:')
-      console.error('  export SNIFF_PROXY_URL=https://your-proxy.workers.dev')
-      process.exit(1)
-    }
-
     const port = options.port ? parseInt(options.port, 10) : env.port
 
     console.log('Linear OAuth Authentication')
@@ -69,7 +60,7 @@ export const authCommand = new Command('auth')
     // Note: The proxy will try to POST tokens to this URL
     // If it fails (e.g., no tunnel), user can copy the token manually
     const callbackUrl = `http://localhost:${port}`
-    const authUrl = `${proxyUrl}/auth/linear?callback=${encodeURIComponent(callbackUrl)}`
+    const authUrl = `${env.proxyUrl}/auth/linear?callback=${encodeURIComponent(callbackUrl)}`
 
     console.log('')
     console.log('Opening browser for authentication...')

@@ -51,7 +51,7 @@ export default {
     }
 
     // Health check
-    if (url.pathname === '/health') {
+    if (url.pathname === '/' || url.pathname === '/health') {
       return new Response('OK', { status: 200 })
     }
 

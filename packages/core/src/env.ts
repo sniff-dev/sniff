@@ -5,9 +5,12 @@
  * This keeps sniff.yml focused on agent definitions only.
  */
 
+/** Default proxy URL for users not self-hosting */
+const DEFAULT_PROXY_URL = 'https://api.sniff.to'
+
 export interface EnvConfig {
   /** Proxy URL for OAuth and webhook forwarding */
-  proxyUrl?: string
+  proxyUrl: string
   /** Local server port */
   port: number
   /** Linear webhook secret for signature verification */
@@ -21,7 +24,7 @@ export interface EnvConfig {
  */
 export function getEnvConfig(): EnvConfig {
   return {
-    proxyUrl: process.env.SNIFF_PROXY_URL,
+    proxyUrl: process.env.SNIFF_PROXY_URL || DEFAULT_PROXY_URL,
     port: parseInt(process.env.SNIFF_PORT || '3847', 10),
     linearWebhookSecret: process.env.LINEAR_WEBHOOK_SECRET,
     worktreeEnabled: process.env.SNIFF_WORKTREE_ENABLED !== 'false',
