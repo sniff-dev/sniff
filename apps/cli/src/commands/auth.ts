@@ -65,6 +65,8 @@ export const authCommand = new Command('auth')
     console.log('')
     console.log('Opening browser for authentication...')
     console.log('')
+    console.log('Tip: If you see "Manage" instead of "Authorize", revoke the app first.')
+    console.log('')
     console.log('If the browser does not open, visit:')
     console.log(`  ${authUrl}`)
     console.log('')
@@ -81,14 +83,23 @@ export const authCommand = new Command('auth')
 
     console.log('Waiting for authentication...')
 
+    // Timeout after 30 seconds
+    const timeout = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('timeout')), 30000)
+    })
+
     try {
-      const tokens = await tokensPromise
+      const tokens = await Promise.race([tokensPromise, timeout])
       await storeTokens(tokens)
       console.log('')
       console.log('[OK] Successfully authenticated with Linear!')
     } catch (error) {
       console.error('')
-      console.error('[X] Authentication failed:', error instanceof Error ? error.message : error)
+      if (error instanceof Error && error.message === 'timeout') {
+        console.error('[X] Authentication timed out. Please try again.')
+      } else {
+        console.error('[X] Authentication failed:', error instanceof Error ? error.message : error)
+      }
       server.stop()
       process.exit(1)
     }

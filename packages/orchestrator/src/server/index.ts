@@ -49,19 +49,40 @@ export class LocalServer {
               return new Response('OK', { status: 200 })
             }
 
+            // CORS headers for OAuth callback (browser makes cross-origin request)
+            const corsHeaders = {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'POST, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type',
+            }
+
+            // Handle CORS preflight for OAuth callback
+            if (url.pathname === '/oauth/callback' && request.method === 'OPTIONS') {
+              return new Response(null, { status: 204, headers: corsHeaders })
+            }
+
             // OAuth callback from proxy
             if (url.pathname === '/oauth/callback' && request.method === 'POST') {
               if (!onOAuthCallback) {
-                return new Response('OAuth callback not configured', { status: 404 })
+                return new Response('OAuth callback not configured', { status: 404, headers: corsHeaders })
               }
               try {
                 const body = (await request.json()) as { platform: string; tokens: OAuthTokens }
-                return onOAuthCallback(body.platform, body.tokens)
+                const response = await onOAuthCallback(body.platform, body.tokens)
+                // Add CORS headers to the response
+                const newHeaders = new Headers(response.headers)
+                for (const [key, value] of Object.entries(corsHeaders)) {
+                  newHeaders.set(key, value)
+                }
+                return new Response(response.body, {
+                  status: response.status,
+                  headers: newHeaders,
+                })
               } catch (error) {
                 logger.error('OAuth callback error', {
                   error: error instanceof Error ? error.message : String(error),
                 })
-                return new Response('Invalid request', { status: 400 })
+                return new Response('Invalid request', { status: 400, headers: corsHeaders })
               }
             }
 

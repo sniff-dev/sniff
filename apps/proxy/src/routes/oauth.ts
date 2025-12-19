@@ -54,8 +54,6 @@ export async function handleOAuth(request: Request, env: Env): Promise<Response>
   // Scopes: read write for general API, app:assignable app:mentionable for agent features
   authUrl.searchParams.set('actor', 'app')
   authUrl.searchParams.set('scope', 'read write app:assignable app:mentionable')
-  // Force re-authorization even if already installed
-  authUrl.searchParams.set('prompt', 'consent')
   authUrl.searchParams.set('state', encodeState(state))
 
   return new Response(null, {
@@ -112,77 +110,44 @@ export async function handleOAuthCallback(request: Request, env: Env): Promise<R
 
     const tokens = await tokenResponse.json()
 
-    // Forward tokens to local agent if callback URL is available
-    let tokensSent = false
-    if (callbackUrl) {
-      try {
-        const callbackResponse = await fetch(`${callbackUrl}/oauth/callback`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            platform: 'linear',
-            tokens,
-          }),
-        })
-        tokensSent = callbackResponse.ok
-      } catch {
-        // Local agent might not be reachable
-      }
-    }
-
-    // Return success page
+    // Return page that sends tokens to local CLI via browser
+    // The browser can reach localhost, but the Cloudflare Worker cannot
     return new Response(
       `<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Sniff - Authentication Successful</title>
-    <style>
-      body {
-        font-family: system-ui, -apple-system, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background: #f5f5f5;
+<head>
+  <meta charset="utf-8">
+  <title>Sniff</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #0f0f0f; color: #f5f0e8; }
+    .card { text-align: center; padding: 2.5rem 3rem; background: rgba(37,33,25,0.5); border: 1px solid #3d3428; border-radius: 12px; min-width: 280px; }
+    .icon { width: 56px; height: 56px; margin: 0 auto 1.5rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .icon svg { width: 28px; height: 28px; }
+    .icon-ok { background: rgba(125,173,106,0.1); }
+    .icon-ok svg { color: #7dad6a; }
+    .icon-err { background: rgba(239,68,68,0.1); }
+    .icon-err svg { color: #ef4444; }
+    h1 { margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 600; }
+    p { margin: 0; color: #a89f8f; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <div class="card" id="c"></div>
+  <script>
+    (async () => {
+      const c = document.getElementById('c');
+      const logo = '<img src="https://sniff.to/logo.png" alt="Sniff" style="height:32px;margin-bottom:1.5rem" onerror="this.style.display=\\'none\\'" />';
+      try {
+        const r = await fetch('${callbackUrl}/oauth/callback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ platform: 'linear', tokens: ${JSON.stringify(tokens)} }) });
+        c.innerHTML = r.ok
+          ? logo + '<div class="icon icon-ok"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><h1>Done</h1><p>You can close this window.</p>'
+          : logo + '<div class="icon icon-err"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div><h1>Failed</h1><p>CLI returned an error.</p>';
+      } catch (e) {
+        c.innerHTML = logo + '<div class="icon icon-err"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div><h1>Failed</h1><p>Could not reach CLI. Is it running?</p>';
       }
-      .container {
-        text-align: center;
-        padding: 2rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        max-width: 500px;
-      }
-      h1 { color: #333; margin-bottom: 1rem; }
-      p { color: #666; line-height: 1.5; }
-      .success { color: #22c55e; }
-      .warning { color: #f59e0b; }
-      code {
-        background: #f0f0f0;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        display: block;
-        margin: 1rem 0;
-        word-break: break-all;
-        font-size: 0.875rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>${tokensSent ? '<span class="success">✓</span>' : ''} Authentication Successful</h1>
-      ${
-        tokensSent
-          ? '<p>Tokens have been saved. You can close this window and return to the CLI.</p>'
-          : `<p class="warning">Could not automatically save tokens. Copy this access token and paste it in the CLI:</p>
-             <code>${(tokens as { access_token: string }).access_token}</code>`
-      }
-    </div>
-  </body>
+    })();
+  </script>
+</body>
 </html>`,
       {
         status: 200,
