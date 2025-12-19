@@ -1,192 +1,170 @@
-# Sniff - Self-Hosted AI Agent Framework
+# Sniff - Local-First AI Agents for Linear
 
-> Declarative AI agents for Linear. Like Docker Compose for AI agents.
+> Declarative AI agents that run on your machine. Like Docker Compose for AI agents.
 
-Deploy AI agents with a simple YAML config. Fully self-hosted, no vendor lock-in.
+Deploy AI agents with a simple YAML config. Code execution stays local, only webhook routing goes through the cloud.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    Linear -->|webhook| Proxy[Proxy\nCloudflare Worker]
+    Proxy -->|forward| Tunnel[Your Tunnel\nngrok/cloudflared]
+    Tunnel --> Agent[Local Agent\nBun Server]
+    Agent --> Runner[Claude Code CLI]
+    Agent --> Worktree[Git Worktree\nisolated execution]
+    Runner --> Worktree
+```
+
+- **Local-first**: Agents run on your machine with full codebase access
+- **Isolated execution**: Each issue gets its own git worktree
+- **Multi-runner support**: Claude Code, Gemini CLI, Codex CLI (coming soon)
+- **No database**: Config from YAML, tokens stored locally in `~/.sniff/`
 
 ## Quick Start
 
-### With Docker (Recommended)
-
 ```bash
-# 1. Create config file
-npx @sniff-dev/cli init
+# Install Bun if you haven't
+curl -fsSL https://bun.sh/install | bash
 
-# 2. Set environment variables
-export LINEAR_ACCESS_TOKEN=lin_api_xxx
-export ANTHROPIC_API_KEY=sk-ant-xxx
+# Clone and install
+git clone https://github.com/sniff-dev/sniff
+cd sniff
+bun install
 
-# 3. Start with Docker
-docker compose up
+# Initialize config
+bun run apps/cli/src/index.ts init
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your proxy URL
+
+# Authenticate with Linear
+bun run apps/cli/src/index.ts auth linear
+
+# Start the agent
+bun run apps/cli/src/index.ts start
 ```
-
-### Without Docker
-
-```bash
-# 1. Install CLI
-npm install -g @sniff-dev/cli
-
-# 2. Create config
-sniff init
-
-# 3. Validate config
-sniff validate
-
-# 4. Start server
-LINEAR_ACCESS_TOKEN=xxx ANTHROPIC_API_KEY=xxx npx @sniff-dev/core
-```
-
-Your agent is now listening at `http://localhost:3000/webhook/linear`.
 
 ## Configuration
 
-Define your agents in `sniff.yml`:
+**sniff.yml** - Agent definitions (commit to git):
 
 ```yaml
-version: '1.0'
+version: "1.1"
 
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
-    description: 'Analyzes and classifies engineering issues'
-
+  - id: triage-agent
+    name: Triage Agent
     system_prompt: |
-      You are a triage specialist for an engineering team.
+      You are a triage agent. When assigned an issue:
+      1. Analyze the issue description
+      2. Explore the codebase for context
+      3. Suggest next steps or solutions
 
-      When a new issue is created:
-      1. Classify as: bug, feature, question, or task
-      2. Set priority: P0 (critical), P1 (high), P2 (medium), P3 (low)
-      3. Provide a brief analysis
+    runner:
+      type: claude
+      max_turns: 10
+      allowed_tools:
+        - Read
+        - Glob
+        - Grep
 
-      Be concise but thorough.
-
-    model:
-      anthropic:
-        name: 'claude-sonnet-4-20250514'
-        temperature: 0.7
-        max_tokens: 4096
+    triggers:
+      labels:
+        - triage
+        - bug
 ```
 
-### With Web Search
+**.env** - Environment config (do not commit):
 
-```yaml
-version: '1.0'
-
-agents:
-  - id: 'research-bot'
-    name: 'Research Assistant'
-    system_prompt: |
-      You are a research assistant.
-      Use web search to find relevant information.
-      Always cite your sources.
-
-    model:
-      anthropic:
-        name: 'claude-sonnet-4-20250514'
-        temperature: 0.7
-        max_tokens: 4096
-        tool_choice:
-          type: 'auto'
-        tools:
-          - type: web_search_20250305
-            name: web_search
-            max_uses: 5
-          - type: web_fetch_20250910
-            name: web_fetch
-            max_uses: 10
-            citations:
-              enabled: true
+```bash
+SNIFF_PROXY_URL=https://your-proxy.workers.dev
+SNIFF_PORT=3847
+LINEAR_WEBHOOK_SECRET=xxx  # optional
 ```
-
-See [CONFIG.md](CONFIG.md) for full configuration reference.
-
-## Environment Variables
-
-| Variable                | Required | Description                                                        |
-| ----------------------- | -------- | ------------------------------------------------------------------ |
-| `LINEAR_ACCESS_TOKEN`   | Yes      | Linear API token ([get one here](https://linear.app/settings/api)) |
-| `ANTHROPIC_API_KEY`     | Yes      | Anthropic API key ([get one here](https://console.anthropic.com))  |
-| `LINEAR_WEBHOOK_SECRET` | No       | Webhook signing secret (recommended for production)                |
-| `PORT`                  | No       | Server port (default: 3000)                                        |
 
 ## CLI Commands
 
 ```bash
-sniff init [name]        # Create sniff.yml template
-sniff validate           # Validate configuration
-sniff validate -c path   # Validate specific config file
+sniff init              # Create sniff.yml and .env.example
+sniff validate          # Validate configuration
+sniff auth linear       # Authenticate with Linear (OAuth)
+sniff start             # Start local agent server
+sniff stop              # Stop running agent
+sniff status            # Show agent and tunnel status
+sniff logs              # View execution logs
 ```
 
-## Architecture
+## How It Works
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│     Linear      │────▶│   Sniff Server  │────▶│   Anthropic     │
-│   (Webhook)     │     │   (Your Host)   │     │   (Claude API)  │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                               │
-                               ▼
-                        ┌─────────────────┐
-                        │   MCP Servers   │
-                        │   (Optional)    │
-                        └─────────────────┘
-```
-
-1. **Linear sends webhook** → When issues are created/updated
-2. **Sniff processes event** → Validates and normalizes the event
-3. **Agent runs** → Sends context to Claude with your system prompt
-4. **Tools execute** → Web search, MCP servers, etc.
-5. **Response posted** → Agent response appears as Linear comment
-
-## Features
-
-- **Declarative Config** - Define agents in YAML, version control your config
-- **Self-Hosted** - Run anywhere: Docker, cloud, or local machine
-- **No Database** - Stateless design, config from YAML file
-- **MCP Support** - Connect any MCP-compatible tool server
-- **Web Search** - Built-in web search and fetch capabilities
-- **Extended Thinking** - Enable Claude's extended thinking for complex analysis
+1. **Linear webhook fires** → Issue created/updated with matching label
+2. **Proxy forwards** → Cloudflare Worker routes to your tunnel
+3. **Local server receives** → Validates webhook, finds matching agent
+4. **Worktree created** → Git worktree for isolated execution
+5. **Runner executes** → Claude Code CLI runs with your system prompt
+6. **Results posted** → Agent response appears in Linear
 
 ## Project Structure
 
 ```
 sniff/
+├── apps/
+│   ├── cli/              # CLI application
+│   └── proxy/            # Cloudflare Worker
 ├── packages/
-│   ├── cli/          # @sniff-dev/cli - Command-line tools
-│   ├── core/         # @sniff-dev/core - Agent runtime and server
-│   └── config/       # @sniff-dev/config - Config validation
-├── docker-compose.yml
-├── Dockerfile
-├── sniff.yml         # Your agent configuration
-└── CONFIG.md         # Configuration specification
+│   ├── core/             # Shared types, env config, logger
+│   ├── config/           # Zod schemas, YAML loading
+│   ├── linear/           # Webhook parsing, API client
+│   ├── orchestrator/     # Server, worktree manager
+│   ├── runner-claude/    # Claude Code CLI wrapper
+│   └── storage/          # Filesystem storage (~/.sniff/)
+├── sniff.yml             # Your agent configuration
+├── sniff.yml.example     # Example configuration
+└── .env.example          # Environment template
 ```
 
-## Webhook Setup
+## Environment Variables
 
-After starting the server, configure Linear to send webhooks:
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SNIFF_PROXY_URL` | Yes | - | Your deployed proxy URL |
+| `SNIFF_PORT` | No | `3847` | Local server port |
+| `LINEAR_WEBHOOK_SECRET` | No | - | Webhook signature verification |
 
-1. Go to **Linear Settings** → **API** → **Webhooks**
-2. Create webhook pointing to `http://your-server:3000/webhook/linear`
-3. Select events: `Issue` (create, update)
-4. (Optional) Copy the signing secret to `LINEAR_WEBHOOK_SECRET`
+Tokens are stored locally in `~/.sniff/tokens/` after running `sniff auth`.
+
+**Note:** Start your tunnel manually (e.g., `ngrok http 3847`) and set `TUNNEL_URL` in `apps/proxy/.env`.
 
 ## Development
 
 ```bash
 # Install dependencies
-pnpm install
+bun install
 
-# Build all packages
-pnpm build
+# Run CLI in development
+bun run apps/cli/src/index.ts [command]
 
-# Run server locally
-LINEAR_ACCESS_TOKEN=xxx ANTHROPIC_API_KEY=xxx node packages/core/dist/bin.js
+# Type check
+bun run typecheck
 
-# Or with Docker
-docker compose up --build
+# Lint
+bun run lint
+
+# Run tests
+bun test
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+## Proxy Deployment
+
+Deploy the Cloudflare Worker to receive webhooks:
+
+```bash
+cd apps/proxy
+bunx wrangler deploy
+```
+
+Then set `SNIFF_PROXY_URL` in your `.env` and configure Linear webhooks to point to `https://your-proxy.workers.dev/webhook/linear`.
 
 ## License
 

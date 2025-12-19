@@ -6,22 +6,33 @@ dist/
 
 # Environment
 .env
+.env.local
 
 # Logs
 *.log
 
 # IDE
 .vscode/
+.idea/
 
 # Docker
 .docker/
 
 # OS
 .DS_Store
+Thumbs.db
 
-# Sniff Config
+# Sniff Config (user-specific)
 sniff.yml
 
 # Local development
 dev/
-CLAUDE.md
+
+# Coverage
+coverage/
+
+# Bun
+bun.lockb
+
+# Cloudflare
+.wrangler/

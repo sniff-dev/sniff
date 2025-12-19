@@ -1,0 +1,25 @@
+{
+  "name": "@sniff/proxy",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Sniff <hello@sniff.to>",
+  "description": "Cloudflare Worker proxy for Sniff webhooks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sniff-dev/sniff.git",
+    "directory": "apps/proxy"
+  },
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251217.0",
+    "@types/bun": "latest",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.56.0"
+  }
+}

@@ -44,17 +44,18 @@ Zod schema for validation. Can be used for custom validation logic.
 ## Configuration Schema
 
 ```yaml
-version: '1.0'
+version: '1.1'
 
 agents:
   - id: 'my-agent'
     name: 'My Agent'
-    system_prompt: 'You are a helpful assistant.'
-    model:
-      anthropic:
-        name: 'claude-sonnet-4-20250514'
-        temperature: 0.7
-        max_tokens: 4096
+    systemPrompt: 'You are a helpful assistant.'
+    runner:
+      type: claude
+      allowedTools:
+        - Read
+        - Glob
+        - Grep
 ```
 
 See [CONFIG.md](../../CONFIG.md) for full specification.

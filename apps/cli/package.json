@@ -1,0 +1,38 @@
+{
+  "name": "@sniff/cli",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Sniff <hello@sniff.to>",
+  "description": "CLI for Sniff - local-first AI agents for Linear",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sniff-dev/sniff.git",
+    "directory": "apps/cli"
+  },
+  "type": "module",
+  "bin": {
+    "sniff": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target node",
+    "prepublishOnly": "bun run build",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@sniff/core": "workspace:*",
+    "@sniff/config": "workspace:*",
+    "@sniff/storage": "workspace:*",
+    "@sniff/linear": "workspace:*",
+    "@sniff/orchestrator": "workspace:*",
+    "@sniff/runner-claude": "workspace:*",
+    "commander": "^14.0.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
+  }
+}

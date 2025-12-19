@@ -1,0 +1,27 @@
+{
+  "tagFormat": "proxy-v${version}",
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": false
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["package.json"],
+        "message": "chore(release): proxy-v${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "releasedLabels": ["released"]
+      }
+    ]
+  ]
+}

@@ -1,14 +1,16 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./packages/cli"
-    },
-    {
-      "path": "./packages/config"
-    },
-    {
-      "path": "./packages/core"
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["bun"],
+    "paths": {
+      "@sniff/*": ["./packages/*/src", "./apps/*/src"]
     }
-  ]
+  },
+  "include": ["apps/**/*.ts", "packages/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,0 +1,8 @@
+[install]
+# Use exact versions for reproducibility
+exact = true
+
+[test]
+# Test configuration
+coverage = true
+coverageDir = "./coverage"

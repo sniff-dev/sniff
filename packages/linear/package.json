@@ -1,14 +1,6 @@
 {
-  "name": "@sniff/core",
+  "name": "@sniff/linear",
   "version": "0.1.0",
-  "license": "MIT",
-  "author": "Sniff <hello@sniff.to>",
-  "description": "Core types and interfaces for Sniff",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sniff-dev/sniff.git",
-    "directory": "packages/core"
-  },
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -18,6 +10,10 @@
   "scripts": {
     "test": "bun test",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sniff/core": "workspace:*",
+    "@linear/sdk": "^68.0.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

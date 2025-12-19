@@ -1,0 +1,9 @@
+name = "sniff-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-12-18"
+compatibility_flags = ["nodejs_compat"]
+
+# Secrets (set via wrangler secret put):
+# LINEAR_CLIENT_ID
+# LINEAR_CLIENT_SECRET
+# WEBHOOK_SECRET

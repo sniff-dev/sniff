@@ -1,0 +1,22 @@
+{
+  "tagFormat": "cli-v${version}",
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/npm",
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["package.json"],
+        "message": "chore(release): cli-v${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "releasedLabels": ["released"]
+      }
+    ]
+  ]
+}

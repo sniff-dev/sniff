@@ -1,8 +1,12 @@
 {
   "name": "sniff",
-  "description": "Deploy AI agents to Linear in seconds",
+  "description": "Local-first AI agents for Linear",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/sniff-dev/sniff.git"
@@ -12,33 +16,24 @@
   },
   "homepage": "https://github.com/sniff-dev/sniff#readme",
   "scripts": {
-    "prepare": "husky",
-    "dev": "pnpm --filter @sniff-dev/cli dev",
-    "dev:cli": "pnpm --filter @sniff-dev/cli dev",
-    "dev:docs": "pnpm --filter sniff-docs dev",
-    "build": "pnpm --recursive build",
-    "generate": "pnpm --filter @sniff-dev/config generate-schema && pnpm --filter @sniff-dev/config generate-docs",
-    "generate:schema": "pnpm --filter @sniff-dev/config generate-schema",
-    "generate:docs": "pnpm --filter @sniff-dev/config generate-docs",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "typecheck": "pnpm --recursive typecheck",
-    "db:shell": "docker compose exec postgres psql -U sniff -d sniff"
+    "dev:cli": "bun run --filter @sniff/cli dev",
+    "dev:proxy": "bun run --filter @sniff/proxy dev",
+    "build": "bun run --filter '*' build",
+    "test": "bun test",
+    "lint": "bunx @biomejs/biome check .",
+    "lint:fix": "bunx @biomejs/biome check --write .",
+    "format": "bunx @biomejs/biome format --write .",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.1",
-    "eslint": "^9.39.1",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.6",
-    "prettier": "^3.6.2",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.4"
+    "@biomejs/biome": "^2.3.10",
+    "@types/bun": "latest",
+    "semantic-release": "^24.2.5",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "typescript": "^5.9.3"
   },
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=8.0.0"
+    "bun": ">=1.1.0"
   }
 }

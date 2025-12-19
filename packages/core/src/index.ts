@@ -1,24 +1,18 @@
-/**
- * @sniff-dev/core
- *
- * Core runtime for the Sniff agent framework.
- * Provides platform abstractions and agent execution.
- */
+// Core types and interfaces for Sniff
 
-// Platform abstraction
-export * from './platforms/index.js';
+export * from './env'
+export * from './types/events'
+export * from './types/runner'
+export * from './types/storage'
+export * from './utils/logger'
 
-// LLM providers
-export * from './llm/index.js';
-
-// Agent runtime
-export * from './agent/index.js';
-
-// Server
-export * from './server/index.js';
-
-// Auth
-export * from './auth/index.js';
-
-// Storage
-export * from './storage/index.js';
+// Re-export config types that aren't already exported by runner
+export type {
+  Hooks,
+  SandboxSettings,
+  SettingSource,
+  ClaudeRunnerOptions,
+  RunnerConfig,
+  AgentConfig,
+  Config,
+} from '@sniff/config'

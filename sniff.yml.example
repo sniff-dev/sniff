@@ -1,0 +1,115 @@
+# Sniff Agent Configuration v2.0
+# Copy this to sniff.yml and customize for your needs
+# Documentation: https://github.com/sniff-dev/sniff
+
+version: "2.0"
+
+agents:
+  # Triage agent - analyzes issues and suggests solutions
+  - id: triage-agent
+    name: Triage Agent
+    description: Analyzes issues and suggests solutions
+    systemPrompt: |
+      You are a helpful triage agent working on a software project.
+
+      When assigned an issue:
+      1. Read and understand the issue description
+      2. Explore the codebase to understand the context
+      3. Identify the root cause if it's a bug
+      4. Suggest concrete next steps or solutions
+      5. Be concise and actionable in your response
+
+      Focus on providing value quickly. Don't over-explain.
+    runner:
+      claude:
+        allowedTools:
+          - Read
+          - Glob
+          - Grep
+        permissionMode: acceptEdits
+
+  # Code agent - implements features and fixes bugs
+  - id: code-agent
+    name: Code Agent
+    description: Implements features and fixes bugs
+    systemPrompt: |
+      You are a skilled developer working on a software project.
+
+      When assigned an issue:
+      1. Understand the requirements from the issue
+      2. Explore the codebase to understand patterns and conventions
+      3. Implement the solution following existing patterns
+      4. Run tests to verify your changes
+      5. Commit your changes with a clear message
+
+      Write clean, maintainable code. Follow existing conventions.
+    runner:
+      claude:
+        allowedTools:
+          - Read
+          - Write
+          - Edit
+          - Glob
+          - Grep
+          - Bash
+        permissionMode: acceptEdits
+        maxTurns: 50
+
+  # Example: Agent with Claude Code preset system prompt
+  # - id: preset-agent
+  #   name: Preset Agent
+  #   description: Agent using Claude Code's built-in system prompt
+  #   systemPrompt:
+  #     type: preset
+  #     preset: claude_code
+  #     append: |
+  #       Additional project-specific instructions go here...
+  #   runner:
+  #     claude:
+  #       allowedTools:
+  #         - Read
+  #         - Write
+  #         - Edit
+  #         - Bash
+  #       permissionMode: acceptEdits
+
+  # Example: Agent with MCP servers
+  # - id: linear-agent
+  #   name: Linear Agent
+  #   description: Agent with Linear integration via MCP
+  #   systemPrompt: |
+  #     You are an agent with access to Linear for issue management.
+  #   runner:
+  #     claude:
+  #       allowedTools:
+  #         - Read
+  #         - Glob
+  #         - Grep
+  #         - mcp__linear__*
+  #       mcpServers:
+  #         linear:
+  #           command: npx
+  #           args: ["-y", "@anthropic-ai/linear-mcp-server"]
+  #           env:
+  #             LINEAR_API_KEY: "${LINEAR_API_KEY}"
+  #       permissionMode: acceptEdits
+
+  # Example: Agent with sandbox enabled
+  # - id: sandboxed-agent
+  #   name: Sandboxed Agent
+  #   description: Agent running in sandboxed mode
+  #   systemPrompt: |
+  #     You are a sandboxed agent with restricted access.
+  #   runner:
+  #     claude:
+  #       allowedTools:
+  #         - Read
+  #         - Write
+  #         - Edit
+  #         - Bash
+  #       permissionMode: acceptEdits
+  #       sandbox:
+  #         enabled: true
+  #         autoAllowBashIfSandboxed: true
+  #         network:
+  #           allowLocalBinding: true
