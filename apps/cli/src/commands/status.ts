@@ -46,7 +46,7 @@ export const statusCommand = new Command('status')
         console.log('  Status: [X] Not running')
       }
     } catch {
-      console.log('  Status: ✗ Not running')
+      console.log('  Status: [X] Not running')
     }
 
     // Check sniff.yml
