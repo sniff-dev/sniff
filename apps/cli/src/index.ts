@@ -13,10 +13,11 @@ import { startCommand } from './commands/start'
 import { statusCommand } from './commands/status'
 import { stopCommand } from './commands/stop'
 import { validateCommand } from './commands/validate'
+import pkg from '../package.json'
 
 const program = new Command()
 
-program.name('sniff').description('Local-first AI agents for Linear').version('0.1.0')
+program.name('sniff').description('Local-first AI agents for Linear').version(pkg.version)
 
 // Register commands
 program.addCommand(initCommand)
