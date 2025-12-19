@@ -9,12 +9,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/sniff-dev/sniff.git"
+    "url": "https://github.com/caiopizzol/sniff.git"
   },
   "bugs": {
-    "url": "https://github.com/sniff-dev/sniff/issues"
+    "url": "https://github.com/caiopizzol/sniff/issues"
   },
-  "homepage": "https://github.com/sniff-dev/sniff#readme",
+  "homepage": "https://github.com/caiopizzol/sniff#readme",
   "scripts": {
     "dev:cli": "bun run --filter @sniff/cli dev",
     "dev:proxy": "bun run --filter @sniff/proxy dev",

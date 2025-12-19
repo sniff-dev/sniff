@@ -26,25 +26,32 @@
       },
       {
         "label": "",
-        "href": "https://github.com/sniff-dev/sniff",
+        "href": "https://github.com/caiopizzol/sniff",
         "icon": "github"
       }
     ],
     "primary": {
       "type": "button",
       "label": "View on GitHub",
-      "href": "https://github.com/sniff-dev/sniff"
+      "href": "https://github.com/caiopizzol/sniff"
     }
   },
   "navigation": {
     "groups": [
       {
         "group": "Getting Started",
-        "pages": ["introduction", "quickstart", "how-it-works"]
+        "pages": [
+          "introduction",
+          "quickstart",
+          "how-it-works"
+        ]
       },
       {
         "group": "Reference",
-        "pages": ["configuration", "schema-reference"]
+        "pages": [
+          "configuration",
+          "schema-reference"
+        ]
       }
     ]
   }

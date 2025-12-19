@@ -5,7 +5,7 @@
 import { Command } from 'commander'
 
 const SNIFF_YML_TEMPLATE = `# Sniff Agent Configuration
-# Documentation: https://github.com/sniff-dev/sniff
+# Documentation: https://github.com/caiopizzol/sniff
 
 version: "2.0"
 

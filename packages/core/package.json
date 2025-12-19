@@ -6,7 +6,7 @@
   "description": "Core types and interfaces for Sniff",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sniff-dev/sniff.git",
+    "url": "https://github.com/caiopizzol/sniff.git",
     "directory": "packages/core"
   },
   "type": "module",

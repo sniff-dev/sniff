@@ -28,7 +28,7 @@ flowchart LR
 curl -fsSL https://bun.sh/install | bash
 
 # Clone and install
-git clone https://github.com/sniff-dev/sniff
+git clone https://github.com/caiopizzol/sniff
 cd sniff
 bun install
 
@@ -126,11 +126,11 @@ sniff/
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `SNIFF_PROXY_URL` | Yes | - | Your deployed proxy URL |
-| `SNIFF_PORT` | No | `3847` | Local server port |
-| `LINEAR_WEBHOOK_SECRET` | No | - | Webhook signature verification |
+| Variable                | Required | Default | Description                    |
+| ----------------------- | -------- | ------- | ------------------------------ |
+| `SNIFF_PROXY_URL`       | Yes      | -       | Your deployed proxy URL        |
+| `SNIFF_PORT`            | No       | `3847`  | Local server port              |
+| `LINEAR_WEBHOOK_SECRET` | No       | -       | Webhook signature verification |
 
 Tokens are stored locally in `~/.sniff/tokens/` after running `sniff auth`.
 
@@ -172,5 +172,5 @@ MIT
 
 ## Support
 
-- **Issues**: [github.com/sniff-dev/sniff/issues](https://github.com/sniff-dev/sniff/issues)
+- **Issues**: [github.com/sniff-dev/sniff/issues](https://github.com/caiopizzol/sniff/issues)
 - **Discord**: [discord.gg/huk9sSQCJA](https://discord.gg/huk9sSQCJA)

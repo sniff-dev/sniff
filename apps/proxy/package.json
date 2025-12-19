@@ -6,7 +6,7 @@
   "description": "Cloudflare Worker proxy for Sniff webhooks",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sniff-dev/sniff.git",
+    "url": "https://github.com/caiopizzol/sniff.git",
     "directory": "apps/proxy"
   },
   "type": "module",

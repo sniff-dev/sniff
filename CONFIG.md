@@ -14,18 +14,18 @@ Sniff is a self-hosted AI agent framework for Linear. The configuration file (`s
 ## Quick Start
 
 ```yaml
-version: '1.0'
+version: "1.0"
 
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
+  - id: "triage-bot"
+    name: "Triage Assistant"
     system_prompt: |
       You are a triage specialist.
       Classify issues as BUG/FEATURE/QUESTION/TASK.
       Set priority P0-P3.
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
         temperature: 0.7
         max_tokens: 4096
 ```
@@ -47,16 +47,16 @@ Configuration values can reference environment variables using `${VAR_NAME}` syn
 
 ```yaml
 agents:
-  - id: 'my-agent'
+  - id: "my-agent"
     # ...
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
         mcp_servers:
           - type: url
-            url: 'https://api.example.com/mcp'
-            name: 'Example MCP'
-            authorization_token: '${EXAMPLE_API_KEY}'
+            url: "https://api.example.com/mcp"
+            name: "Example MCP"
+            authorization_token: "${EXAMPLE_API_KEY}"
 ```
 
 **Syntax**:
@@ -67,7 +67,7 @@ agents:
 ## Top-Level Structure
 
 ```yaml
-version: '1.0' # Required - schema version
+version: "1.0" # Required - schema version
 agents: [] # Required - array of agent definitions
 ```
 
@@ -85,7 +85,7 @@ Unique identifier for the agent.
 
 ```yaml
 agents:
-  - id: 'triage-bot'
+  - id: "triage-bot"
 ```
 
 ### `name` (required)
@@ -97,8 +97,8 @@ Human-readable display name.
 
 ```yaml
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
+  - id: "triage-bot"
+    name: "Triage Assistant"
 ```
 
 ### `description` (optional)
@@ -110,9 +110,9 @@ Brief description of the agent's purpose.
 
 ```yaml
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
-    description: 'Analyzes and classifies engineering issues'
+  - id: "triage-bot"
+    name: "Triage Assistant"
+    description: "Analyzes and classifies engineering issues"
 ```
 
 ### `system_prompt` (required)
@@ -124,8 +124,8 @@ Core instructions that define how the agent thinks and responds.
 
 ```yaml
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
+  - id: "triage-bot"
+    name: "Triage Assistant"
     system_prompt: |
       You are a triage specialist for a development team.
 
@@ -145,11 +145,11 @@ Model configuration. Currently only Anthropic is supported.
 
 ```yaml
 agents:
-  - id: 'triage-bot'
+  - id: "triage-bot"
     # ...
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
         temperature: 0.7
         max_tokens: 4096
 ```
@@ -204,8 +204,8 @@ Custom stop sequences.
 model:
   anthropic:
     stop_sequences:
-      - 'END_ANALYSIS'
-      - '---'
+      - "END_ANALYSIS"
+      - "---"
 ```
 
 ### `model.anthropic.thinking` (optional)
@@ -218,7 +218,7 @@ Extended thinking for complex reasoning.
 model:
   anthropic:
     thinking:
-      type: 'enabled'
+      type: "enabled"
       budget_tokens: 2000
 ```
 
@@ -237,7 +237,7 @@ Metadata for tracking.
 model:
   anthropic:
     metadata:
-      user_id: 'workspace-abc123'
+      user_id: "workspace-abc123"
 ```
 
 ### `model.anthropic.tool_choice` (optional)
@@ -279,15 +279,15 @@ tools:
     name: web_search
     max_uses: 10 # Optional: limit per conversation
     allowed_domains: # Optional
-      - 'docs.example.com'
+      - "docs.example.com"
     blocked_domains: # Optional
-      - 'spam.com'
+      - "spam.com"
     user_location: # Optional
       type: approximate
-      city: 'San Francisco'
-      region: 'California'
-      country: 'US'
-      timezone: 'America/Los_Angeles'
+      city: "San Francisco"
+      region: "California"
+      country: "US"
+      timezone: "America/Los_Angeles"
 ```
 
 #### Web Fetch Tool
@@ -298,9 +298,9 @@ tools:
     name: web_fetch
     max_uses: 20 # Optional
     allowed_domains: # Optional
-      - 'docs.example.com'
+      - "docs.example.com"
     blocked_domains: # Optional
-      - 'private.example.com'
+      - "private.example.com"
     citations: # Optional
       enabled: true
     max_content_tokens: 100000 # Optional
@@ -315,14 +315,14 @@ MCP (Model Context Protocol) servers for external integrations.
 ```yaml
 mcp_servers:
   - type: url
-    url: 'https://api.example.com/mcp'
-    name: 'Example Integration'
-    authorization_token: '${EXAMPLE_API_KEY}' # Use env var
+    url: "https://api.example.com/mcp"
+    name: "Example Integration"
+    authorization_token: "${EXAMPLE_API_KEY}" # Use env var
     tool_configuration: # Optional
       enabled: true
       allowed_tools:
-        - 'get_data'
-        - 'search'
+        - "get_data"
+        - "search"
 ```
 
 ## Complete Examples
@@ -330,29 +330,29 @@ mcp_servers:
 ### Minimal Configuration
 
 ```yaml
-version: '1.0'
+version: "1.0"
 
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
+  - id: "triage-bot"
+    name: "Triage Assistant"
     system_prompt: |
       You are a triage specialist.
       Classify issues as BUG/FEATURE/QUESTION/TASK.
       Set priority P0-P3.
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
 ```
 
 ### Full Configuration
 
 ```yaml
-version: '1.0'
+version: "1.0"
 
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
-    description: 'Analyzes and classifies engineering issues'
+  - id: "triage-bot"
+    name: "Triage Assistant"
+    description: "Analyzes and classifies engineering issues"
     system_prompt: |
       You are a triage specialist for a software development team.
 
@@ -376,7 +376,7 @@ agents:
 
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
         temperature: 0.7
         max_tokens: 4096
 ```
@@ -384,12 +384,12 @@ agents:
 ### Configuration with Web Search
 
 ```yaml
-version: '1.0'
+version: "1.0"
 
 agents:
-  - id: 'research-bot'
-    name: 'Research Assistant'
-    description: 'AI agent that can search the web'
+  - id: "research-bot"
+    name: "Research Assistant"
+    description: "AI agent that can search the web"
     system_prompt: |
       You are a research assistant.
       Use web search to find relevant information.
@@ -397,11 +397,11 @@ agents:
 
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
         temperature: 0.7
         max_tokens: 4096
         tool_choice:
-          type: 'auto'
+          type: "auto"
         tools:
           - type: web_search_20250305
             name: web_search
@@ -416,24 +416,24 @@ agents:
 ### Multiple Agents
 
 ```yaml
-version: '1.0'
+version: "1.0"
 
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Bot'
+  - id: "triage-bot"
+    name: "Triage Bot"
     system_prompt: |
       You triage incoming issues.
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
 
-  - id: 'docs-bot'
-    name: 'Documentation Bot'
+  - id: "docs-bot"
+    name: "Documentation Bot"
     system_prompt: |
       You help with documentation questions.
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
         tools:
           - type: web_search_20250305
             name: web_search
@@ -508,4 +508,4 @@ Environment variable LINEAR_ACCESS_TOKEN is not set
 
 - [Linear API Documentation](https://developers.linear.app)
 - [Anthropic API Documentation](https://docs.anthropic.com)
-- [Sniff GitHub](https://github.com/sniff-dev/sniff)
+- [Sniff GitHub](https://github.com/caiopizzol/sniff)

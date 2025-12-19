@@ -17,7 +17,7 @@ Get your first AI agent running with Docker in under 5 minutes.
 
 ```bash
 # Clone the repository
-git clone https://github.com/sniff-dev/sniff.git
+git clone https://github.com/caiopizzol/sniff.git
 cd sniff
 
 # Create environment file
@@ -33,8 +33,9 @@ ANTHROPIC_API_KEY=sk-ant-xxxxx
 ```
 
 <Note>
-  Get your Linear API token from [Linear Settings → API](https://linear.app/settings/api). Get your
-  Anthropic API key from [Anthropic Console](https://console.anthropic.com).
+  Get your Linear API token from [Linear Settings →
+  API](https://linear.app/settings/api). Get your Anthropic API key from
+  [Anthropic Console](https://console.anthropic.com).
 </Note>
 
 ## Step 2: Create Agent Configuration
@@ -42,12 +43,12 @@ ANTHROPIC_API_KEY=sk-ant-xxxxx
 Create a `sniff.yml` file (or use the default):
 
 ```yaml
-version: '1.0'
+version: "1.0"
 
 agents:
-  - id: 'triage-bot'
-    name: 'Triage Assistant'
-    description: 'Classifies and prioritizes incoming issues'
+  - id: "triage-bot"
+    name: "Triage Assistant"
+    description: "Classifies and prioritizes incoming issues"
 
     system_prompt: |
       You are a triage specialist for an engineering team.
@@ -62,7 +63,7 @@ agents:
 
     model:
       anthropic:
-        name: 'claude-sonnet-4-20250514'
+        name: "claude-sonnet-4-20250514"
         temperature: 0.3
         max_tokens: 1500
 ```
@@ -98,8 +99,8 @@ sniff  |   - POST http://localhost:3000/webhook/linear
 5. Click **Create**
 
 <Tip>
-  For local development, use [ngrok](https://ngrok.com) to expose your local server: ```bash ngrok
-  http 3000 ``` Then use the ngrok URL for your webhook.
+  For local development, use [ngrok](https://ngrok.com) to expose your local
+  server: ```bash ngrok http 3000 ``` Then use the ngrok URL for your webhook.
 </Tip>
 
 ## Step 5: Test It Out
@@ -132,8 +133,9 @@ Create an issue in Linear. Your agent will automatically respond with its analys
   </Accordion>
 
 <Accordion title="Webhook not receiving events">
-  - Verify the webhook URL is accessible from the internet - Check Linear webhook settings show
-  "Active" status - Look at server logs for incoming requests
+  - Verify the webhook URL is accessible from the internet - Check Linear
+  webhook settings show "Active" status - Look at server logs for incoming
+  requests
 </Accordion>
 
   <Accordion title="Agent not responding">
