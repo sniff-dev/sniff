@@ -1,4 +1,4 @@
-name: Release Packages
+name: Release Apps
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - main
       - stable
     paths:
-      - 'packages/**'
+      - 'apps/**'
 
 jobs:
   release:
@@ -21,9 +21,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
+          bun-version: latest
 
       - uses: actions/setup-node@v6
         with:
@@ -31,36 +31,24 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
 
-      - name: Generate schema and documentation
-        run: |
-          pnpm --filter @sniff-dev/config generate-schema
-          pnpm --filter @sniff-dev/config generate-docs
+      - name: Build CLI
+        run: bun run --filter @sniff/cli build
 
-      - name: Build all packages
-        run: pnpm --filter "./packages/**" build
-
-      - name: Release @sniff-dev/config
+      - name: Release @sniff/cli
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm --filter @sniff-dev/config exec semantic-release
+        run: bun run --filter @sniff/cli exec semantic-release
 
-      - name: Release @sniff-dev/cli
+      - name: Release @sniff/proxy
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm --filter @sniff-dev/cli exec semantic-release
-
-      - name: Release @sniff-dev/core
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm --filter @sniff-dev/core exec semantic-release
+        run: bun run --filter @sniff/proxy exec semantic-release
 
       # Sync stable back to main after stable release
       - name: Sync stable to main
