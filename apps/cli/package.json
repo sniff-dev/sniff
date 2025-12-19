@@ -18,12 +18,12 @@
   ],
   "scripts": {
     "dev": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target node",
+    "build": "bun build src/index.ts --outdir dist --target node --external @anthropic-ai/claude-agent-sdk",
     "prepublishOnly": "bun run build",
     "test": "bun test"
   },
   "dependencies": {
-    "@anthropic-ai/claude-code": "^2.0.73"
+    "@anthropic-ai/claude-agent-sdk": "^0.1.73"
   },
   "devDependencies": {
     "@sniff/core": "workspace:*",
