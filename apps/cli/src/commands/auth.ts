@@ -4,7 +4,7 @@
 
 import { getEnvConfig } from '@sniff/core'
 import { LocalServer, type OAuthTokens } from '@sniff/orchestrator'
-import { ensureDirectories, tokenStorage } from '@sniff/storage'
+import { ensureDirectories, ensureLocalDirectories, tokenStorage } from '@sniff/storage'
 import { Command } from 'commander'
 
 export const authCommand = new Command('auth')
@@ -90,9 +90,23 @@ export const authCommand = new Command('auth')
 
     try {
       const tokens = await Promise.race([tokensPromise, timeout])
-      await storeTokens(tokens)
-      console.log('')
-      console.log('[OK] Successfully authenticated with Linear!')
+
+      // Store locally if --force was used in a project (sniff.yml exists)
+      const configFile = Bun.file('sniff.yml')
+      const storeLocally = options.force && (await configFile.exists())
+
+      if (storeLocally) {
+        await ensureLocalDirectories()
+        await storeTokensLocally(tokens)
+        console.log('')
+        console.log('[OK] Successfully authenticated with Linear!')
+        console.log('  Token stored locally in ./.sniff/tokens/')
+      } else {
+        await storeTokens(tokens)
+        console.log('')
+        console.log('[OK] Successfully authenticated with Linear!')
+        console.log('  Token stored globally in ~/.sniff/tokens/')
+      }
     } catch (error) {
       console.error('')
       if (error instanceof Error && error.message === 'timeout') {
@@ -110,6 +124,16 @@ export const authCommand = new Command('auth')
 
 async function storeTokens(tokens: OAuthTokens) {
   await tokenStorage.set('linear', {
+    accessToken: tokens.access_token,
+    refreshToken: tokens.refresh_token,
+    tokenType: tokens.token_type,
+    scope: tokens.scope,
+    expiresAt: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000) : undefined,
+  })
+}
+
+async function storeTokensLocally(tokens: OAuthTokens) {
+  await tokenStorage.setLocal('linear', {
     accessToken: tokens.access_token,
     refreshToken: tokens.refresh_token,
     tokenType: tokens.token_type,

@@ -29,8 +29,15 @@ export const statusCommand = new Command('status')
 
     // Check authentication
     console.log('Authentication:')
+    const hasLocalLinear = await tokenStorage.hasLocal('linear')
     const hasLinear = await tokenStorage.has('linear')
-    console.log(`  Linear: ${hasLinear ? '[OK] Authenticated' : '[X] Not authenticated'}`)
+    if (hasLocalLinear) {
+      console.log('  Linear: [OK] Authenticated (local)')
+    } else if (hasLinear) {
+      console.log('  Linear: [OK] Authenticated (global)')
+    } else {
+      console.log('  Linear: [X] Not authenticated')
+    }
 
     console.log('')
 
