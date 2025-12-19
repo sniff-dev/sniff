@@ -22,17 +22,15 @@
     "prepublishOnly": "bun run build",
     "test": "bun test"
   },
-  "dependencies": {
+  "devDependencies": {
     "@sniff/core": "workspace:*",
     "@sniff/config": "workspace:*",
     "@sniff/storage": "workspace:*",
     "@sniff/linear": "workspace:*",
     "@sniff/orchestrator": "workspace:*",
     "@sniff/runner-claude": "workspace:*",
-    "commander": "^14.0.2"
-  },
-  "devDependencies": {
     "@types/bun": "latest",
+    "commander": "^14.0.2",
     "typescript": "^5.9.3"
   }
 }
