@@ -4,15 +4,15 @@
   "name": "Sniff",
   "description": "Self-hosted AI agent framework for Linear",
   "logo": {
-    "light": "/logo/light.png",
-    "dark": "/logo/dark.png",
+    "light": "/logo/logo.png",
+    "dark": "/logo/logo.png",
     "href": "https://sniff.to"
   },
   "favicon": "/favicon.png",
   "colors": {
-    "primary": "#3b82f6",
-    "light": "#60a5fa",
-    "dark": "#E4E4E7"
+    "primary": "#c9a66b",
+    "light": "#d4b87a",
+    "dark": "#8b7355"
   },
   "appearance": {
     "default": "dark"

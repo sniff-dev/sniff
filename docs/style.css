@@ -1,15 +1,62 @@
 /* Custom styling for Sniff documentation */
+/* Warm dark theme - matching sniff.to branding */
 
-/* Primary CTA button (Get Started) */
+/* Color variables */
+:root {
+  --sniff-bg: #1a1814;
+  --sniff-surface: #252119;
+  --sniff-border: #3d3428;
+  --sniff-text-primary: #f5f0e8;
+  --sniff-text-secondary: #a89f8f;
+  --sniff-accent: #c9a66b;
+  --sniff-accent-hover: #d4b87a;
+  --sniff-accent-muted: #8b7355;
+}
+
+/* Primary CTA button */
 #topbar-cta-button span {
-  color: #000 !important;
+  color: var(--sniff-bg) !important;
 }
 
 #topbar-cta-button svg {
-  color: #000 !important;
+  color: var(--sniff-bg) !important;
 }
 
-/* Hide theme toggle button */
+/* Hide theme toggle button (dark mode only) */
 button[aria-label='Toggle dark mode'] {
   display: none !important;
+}
+
+/* Dark mode background overrides */
+[data-theme="dark"] body,
+[data-theme="dark"] .dark {
+  background-color: var(--sniff-bg) !important;
+}
+
+/* Sidebar background */
+[data-theme="dark"] aside,
+[data-theme="dark"] nav {
+  background-color: var(--sniff-bg) !important;
+}
+
+/* Code blocks with warm styling */
+[data-theme="dark"] pre {
+  background-color: var(--sniff-surface) !important;
+  border-color: var(--sniff-border) !important;
+}
+
+[data-theme="dark"] code {
+  background-color: var(--sniff-surface) !important;
+}
+
+/* Cards and surfaces */
+[data-theme="dark"] .card,
+[data-theme="dark"] [class*="card"] {
+  background-color: var(--sniff-surface) !important;
+  border-color: var(--sniff-border) !important;
+}
+
+/* Borders */
+[data-theme="dark"] [class*="border"] {
+  border-color: var(--sniff-border) !important;
 }

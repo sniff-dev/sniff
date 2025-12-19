@@ -1,3 +1,4 @@
 node_modules/
 .mint/
 .DS_Store
+*lock.*
