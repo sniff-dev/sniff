@@ -91,9 +91,8 @@ export const authCommand = new Command('auth')
     try {
       const tokens = await Promise.race([tokensPromise, timeout])
 
-      // Store locally if --force was used in a project (sniff.yml exists)
-      const configFile = Bun.file('sniff.yml')
-      const storeLocally = options.force && (await configFile.exists())
+      // Replace existing tokens in the same location they were found
+      const storeLocally = await tokenStorage.hasLocal('linear')
 
       if (storeLocally) {
         await ensureLocalDirectories()
