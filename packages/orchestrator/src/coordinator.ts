@@ -78,9 +78,9 @@ export class Coordinator {
       mcpServers = {
         ...mcpServers,
         linear: {
-          command: 'npx',
-          args: ['-y', '@anthropic-ai/linear-mcp'],
-          env: { LINEAR_API_KEY: this.linearAccessToken },
+          type: 'sse' as const,
+          url: 'https://mcp.linear.app/sse',
+          headers: { Authorization: `Bearer ${this.linearAccessToken}` },
         },
       }
     }

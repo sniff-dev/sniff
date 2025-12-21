@@ -73,25 +73,26 @@ agents:
   #         - Bash
   #       permissionMode: acceptEdits
 
-  # Example: Agent with MCP servers
-  # - id: linear-agent
-  #   name: Linear Agent
-  #   description: Agent with Linear integration via MCP
+  # Example: Agent with custom MCP servers
+  # Note: Linear MCP is auto-injected when authenticated via `sniff auth linear`
+  # - id: mcp-agent
+  #   name: MCP Agent
+  #   description: Agent with custom MCP server integration
   #   systemPrompt: |
-  #     You are an agent with access to Linear for issue management.
+  #     You are an agent with access to custom tools via MCP.
   #   runner:
   #     claude:
   #       allowedTools:
   #         - Read
   #         - Glob
   #         - Grep
-  #         - mcp__linear__*
+  #         - mcp__my-server__*
   #       mcpServers:
-  #         linear:
+  #         my-server:
   #           command: npx
-  #           args: ["-y", "@anthropic-ai/linear-mcp-server"]
+  #           args: ["-y", "my-mcp-server"]
   #           env:
-  #             LINEAR_API_KEY: "${LINEAR_API_KEY}"
+  #             API_KEY: "${MY_API_KEY}"
   #       permissionMode: acceptEdits
 
   # Example: Agent with sandbox enabled
