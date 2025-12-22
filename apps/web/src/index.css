@@ -1,0 +1,40 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-sniff-bg: #1a1814;
+  --color-sniff-surface: #252119;
+  --color-sniff-border: #3d3428;
+  --color-sniff-text-primary: #f5f0e8;
+  --color-sniff-text-secondary: #a89f8f;
+  --color-sniff-accent: #c9a66b;
+  --color-sniff-accent-hover: #d4b87a;
+  --color-sniff-accent-muted: #8b7355;
+  --color-sniff-success: #7dad6a;
+}
+
+:root {
+  --sniff-bg: #1a1814;
+  --sniff-surface: #252119;
+  --sniff-border: #3d3428;
+  --sniff-text-primary: #f5f0e8;
+  --sniff-text-secondary: #a89f8f;
+  --sniff-accent: #c9a66b;
+  --sniff-accent-hover: #d4b87a;
+  --sniff-accent-muted: #8b7355;
+  --sniff-success: #7dad6a;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--sniff-bg);
+  color: var(--sniff-text-primary);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}

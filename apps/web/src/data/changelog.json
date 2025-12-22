@@ -1,0 +1,36 @@
+{
+  "entries": [
+    {
+      "id": "2025-11-27-fully-self-hosted",
+      "date": "2025-11-27",
+      "category": "announcement",
+      "title": "Sniff is now fully self-hosted",
+      "description": "Run Sniff entirely on your infrastructure. No cloud backend, no vendor lock-in. Deploy with Docker, configure with YAML, and keep your data where it belongs—on your servers.",
+      "contentFile": "/changelog/2025-11-27-fully-self-hosted.md"
+    },
+    {
+      "id": "2025-11-15-third-party-mcp",
+      "date": "2025-11-15",
+      "category": "feature",
+      "title": "Third-Party MCP servers",
+      "description": "Connect your agents to any MCP-compatible service. Use environment variables to securely configure third-party tools like Ragie knowledge bases, custom integrations, or enterprise services—all through simple YAML configuration.",
+      "contentFile": "/changelog/2025-11-15-third-party-mcp.md"
+    },
+    {
+      "id": "2025-11-11-github-integration",
+      "date": "2025-11-11",
+      "category": "feature",
+      "title": "GitHub MCP integration",
+      "description": "Connect GitHub to your agents. Search issues, fetch repository data, and investigate problems—all through MCP tools configured in YAML.",
+      "contentFile": "/changelog/2025-11-11-github-integration.md"
+    },
+    {
+      "id": "2025-11-07-beta-launch",
+      "date": "2025-11-07",
+      "category": "launch",
+      "title": "Sniff beta launch",
+      "description": "Today we're launching Sniff in public beta. Build AI agents tailored to your workflows—triage bots, docs search, release notes, and more. Configure each agent's capabilities, tools, and behavior through simple YAML. Deploy multiple specialized agents, all managed through one unified platform.",
+      "contentFile": "/changelog/2025-11-07-beta-launch.md"
+    }
+  ]
+}

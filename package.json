@@ -18,6 +18,8 @@
   "scripts": {
     "dev:cli": "bun run --filter @sniff-dev/cli dev",
     "dev:proxy": "bun run --filter @sniff-dev/proxy dev",
+    "dev:web": "bun run --filter @sniff-dev/web dev",
+    "dev:docs": "bun run --filter @sniff-dev/docs dev",
     "build": "bun run --filter '*' build",
     "test": "bun test",
     "lint": "bunx @biomejs/biome check .",
