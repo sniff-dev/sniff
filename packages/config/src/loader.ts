@@ -49,7 +49,58 @@ export function validateConfig(data: unknown): Config {
     throw new Error(`Invalid configuration:\n${errors}`)
   }
 
+  validateAgentTriggers(result.data)
+
   return result.data
+}
+
+/**
+ * Validate that agent label+team combinations don't conflict
+ */
+function validateAgentTriggers(config: Config): void {
+  const triggers = new Map<string, string>() // "label:team" -> agentId
+
+  for (const agent of config.agents) {
+    // Skip agents without labels (they only trigger via @mention/delegation)
+    if (!agent.label) {
+      continue
+    }
+
+    const key = agent.team ? `${agent.label}:${agent.team}` : agent.label
+
+    // Check for exact duplicates (same label + same team)
+    const existing = triggers.get(key)
+    if (existing) {
+      const scope = agent.team ? `label "${agent.label}" and team "${agent.team}"` : `label "${agent.label}"`
+      throw new Error(`Duplicate trigger: agents "${existing}" and "${agent.id}" both use ${scope}`)
+    }
+
+    // Check for conflicts: if this agent has no team, no other agent can use the same label
+    // If this agent has a team, check that no agent without team uses the same label
+    if (agent.team) {
+      const noTeamKey = agent.label
+      const noTeamAgent = triggers.get(noTeamKey)
+      if (noTeamAgent) {
+        throw new Error(
+          `Conflicting triggers: agent "${noTeamAgent}" uses label "${agent.label}" for all teams, ` +
+            `but agent "${agent.id}" uses the same label for team "${agent.team}"`
+        )
+      }
+    } else {
+      // This agent has no team - check no other agent uses same label with a specific team
+      for (const [existingKey, existingAgentId] of triggers) {
+        if (existingKey.startsWith(`${agent.label}:`)) {
+          const existingTeam = existingKey.split(':')[1]
+          throw new Error(
+            `Conflicting triggers: agent "${agent.id}" uses label "${agent.label}" for all teams, ` +
+              `but agent "${existingAgentId}" uses the same label for team "${existingTeam}"`
+          )
+        }
+      }
+    }
+
+    triggers.set(key, agent.id)
+  }
 }
 
 /**

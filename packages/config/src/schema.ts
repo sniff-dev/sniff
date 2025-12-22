@@ -172,6 +172,8 @@ export const AgentConfigSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   description: z.string().optional(),
+  label: z.string().min(1).optional(),
+  team: z.string().min(1).optional(),
   systemPrompt: SystemPromptSchema.optional(),
   runner: RunnerConfigSchema,
 })

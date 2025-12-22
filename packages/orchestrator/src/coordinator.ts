@@ -124,12 +124,19 @@ export class Coordinator {
       // 1. Send immediate thought activity (must be within 10s)
       await client.sendThought(sessionId, 'Sniffing out the issue...')
 
-      // 2. Get the first agent from config (for now, use first available)
-      const agent = this.config.agents[0]
-      if (!agent) {
-        await client.sendError(sessionId, 'No agent configured')
+      // 2. Find matching agent based on issue labels and team
+      const match = await this.findAgentForSession(issue.id, client)
+      if (!match) {
+        await client.sendError(sessionId, 'No matching agent found for this issue')
         return
       }
+      const { agent } = match
+
+      logger.info('Matched agent for session', {
+        agentId: agent.id,
+        label: agent.label,
+        team: agent.team,
+      })
 
       // 3. Create worktree for isolated execution
       let worktreePath: string
@@ -256,11 +263,14 @@ export class Coordinator {
    * Handle an incoming webhook event (legacy Issue-based)
    */
   async handleWebhook(event: LinearWebhookEvent): Promise<AgentRunEvent | null> {
-    // Get first configured agent
-    const agent = this.getAgent()
+    // Find agent matching the event's labels and team
+    const agent = this.findAgentForWebhook(event)
 
     if (!agent) {
-      logger.warn('No agent configured')
+      logger.debug('No matching agent for webhook', {
+        labels: event.data.labels,
+        teamKey: event.data.teamKey,
+      })
       return null
     }
 
@@ -313,10 +323,68 @@ export class Coordinator {
   }
 
   /**
-   * Get the first configured agent
+   * Find agent matching labels and team
    */
-  private getAgent(): AgentConfig | null {
-    return this.config.agents[0] || null
+  private findAgent(labels: string[], teamKey: string): AgentConfig | null {
+    for (const agent of this.config.agents) {
+      // Skip agents without labels (they don't participate in label-based matching)
+      if (!agent.label) {
+        continue
+      }
+
+      // Check if agent's label matches any of the issue's labels
+      if (!labels.includes(agent.label)) {
+        continue
+      }
+
+      // If agent has a team filter, check it matches
+      if (agent.team && agent.team !== teamKey) {
+        continue
+      }
+
+      return agent
+    }
+
+    return null
+  }
+
+  /**
+   * Find agent matching the webhook event's labels and team
+   */
+  private findAgentForWebhook(event: LinearWebhookEvent): AgentConfig | null {
+    const { labels, teamKey } = event.data
+    return this.findAgent(labels, teamKey)
+  }
+
+  /**
+   * Fetch issue details from Linear and find matching agent
+   */
+  private async findAgentForSession(
+    issueId: string,
+    client: LinearClient,
+  ): Promise<{ agent: AgentConfig; labels: string[]; teamKey: string } | null> {
+    try {
+      const issue = await client.getIssue(issueId)
+      const labels = await issue.labels()
+      const team = await issue.team
+
+      const labelNames = labels.nodes.map((l) => l.name)
+      const teamKey = team?.key ?? ''
+
+      const agent = this.findAgent(labelNames, teamKey)
+      if (agent) {
+        return { agent, labels: labelNames, teamKey }
+      }
+
+      logger.debug('No matching agent for session', { labels: labelNames, teamKey })
+      return null
+    } catch (error) {
+      logger.error('Failed to fetch issue for agent matching', {
+        issueId,
+        error: error instanceof Error ? error.message : String(error),
+      })
+      return null
+    }
   }
 
   /**

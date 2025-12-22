@@ -8,6 +8,8 @@ agents:
   # Triage agent - analyzes issues and suggests solutions
   - id: triage-agent
     name: Triage Agent
+    label: sniff-triage
+    # team: ENG  # Optional: restrict to a specific team
     description: Analyzes issues and suggests solutions
     systemPrompt: |
       You are a helpful triage agent working on a software project.
@@ -31,6 +33,8 @@ agents:
   # Code agent - implements features and fixes bugs
   - id: code-agent
     name: Code Agent
+    label: sniff-code
+    # team: ENG  # Optional: restrict to a specific team
     description: Implements features and fixes bugs
     systemPrompt: |
       You are a skilled developer working on a software project.
@@ -58,6 +62,8 @@ agents:
   # Example: Agent with Claude Code preset system prompt
   # - id: preset-agent
   #   name: Preset Agent
+  #   label: sniff-preset
+  #   team: ENG  # Optional: restrict to a specific team
   #   description: Agent using Claude Code's built-in system prompt
   #   systemPrompt:
   #     type: preset
@@ -77,6 +83,7 @@ agents:
   # Note: Linear MCP is auto-injected when authenticated via `sniff auth linear`
   # - id: mcp-agent
   #   name: MCP Agent
+  #   label: sniff-mcp
   #   description: Agent with custom MCP server integration
   #   systemPrompt: |
   #     You are an agent with access to custom tools via MCP.
@@ -98,6 +105,7 @@ agents:
   # Example: Agent with sandbox enabled
   # - id: sandboxed-agent
   #   name: Sandboxed Agent
+  #   label: sniff-sandbox
   #   description: Agent running in sandboxed mode
   #   systemPrompt: |
   #     You are a sandboxed agent with restricted access.
