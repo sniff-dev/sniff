@@ -1,19 +1,16 @@
 # Web Dockerfile - Build stage
-FROM node:20-alpine AS build
+FROM oven/bun:1 AS build
 
 WORKDIR /app
 
-# Enable pnpm
-RUN corepack enable pnpm
-
 # Copy workspace configuration
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json bun.lock ./
 
 # Copy package.json for web
 COPY apps/web/package.json ./apps/web/
 
-# Install all dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies
+RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY apps/web ./apps/web
@@ -24,7 +21,7 @@ ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
 # Build the web app
-RUN pnpm --filter @sniff-dev/web build
+RUN bun run --filter @sniff-dev/web build
 
 # Serve with nginx
 FROM nginx:alpine
