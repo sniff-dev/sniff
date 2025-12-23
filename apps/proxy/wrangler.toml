@@ -11,7 +11,7 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["ConnectionHandler"]
+new_sqlite_classes = ["ConnectionHandler"]
 
 # Secrets (set via wrangler secret put):
 # LINEAR_CLIENT_ID - OAuth client ID from Linear
