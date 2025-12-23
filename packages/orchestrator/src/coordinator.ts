@@ -323,21 +323,20 @@ export class Coordinator {
   }
 
   /**
-   * Find agent matching labels and team
+   * Find agent matching labels and/or team
+   * - No filters: matches everything
+   * - Label only: matches issues with that label
+   * - Team only: matches issues in that team
+   * - Both: matches issues with label AND in team
    */
   private findAgent(labels: string[], teamKey: string): AgentConfig | null {
     for (const agent of this.config.agents) {
-      // Skip agents without labels (they don't participate in label-based matching)
-      if (!agent.label) {
+      // If agent has label filter, check it matches
+      if (agent.label && !labels.includes(agent.label)) {
         continue
       }
 
-      // Check if agent's label matches any of the issue's labels
-      if (!labels.includes(agent.label)) {
-        continue
-      }
-
-      // If agent has a team filter, check it matches
+      // If agent has team filter, check it matches
       if (agent.team && agent.team !== teamKey) {
         continue
       }
