@@ -2,7 +2,7 @@
  * Linear attachment pre-fetching
  *
  * Fetches files from uploads.linear.app URLs using OAuth authentication
- * before sending them to the agent.
+ * and attachment metadata (Slack messages, etc.) via GraphQL.
  */
 
 import { mkdir } from 'node:fs/promises'
@@ -17,6 +17,19 @@ export interface FetchedAttachment {
   /** Local file path where the attachment was saved */
   localPath?: string
   error?: string
+}
+
+export interface AttachmentMessage {
+  body: string
+  author: string
+  timestamp?: string
+}
+
+export interface AttachmentMetadata {
+  title: string
+  url: string
+  source?: { type: string }
+  messages: AttachmentMessage[]
 }
 
 /**
@@ -112,5 +125,88 @@ export function formatAttachmentsForPrompt(attachments: FetchedAttachment[]): st
   }
 
   sections.push('')
+  return sections.join('\n')
+}
+
+/**
+ * Fetch attachment metadata from Linear GraphQL API
+ */
+export async function fetchAttachmentMetadata(
+  issueId: string,
+  accessToken: string,
+): Promise<AttachmentMetadata[]> {
+  const query = `query($id: String!) {
+    issue(id: $id) {
+      attachments {
+        nodes {
+          title
+          url
+          metadata
+          source
+        }
+      }
+    }
+  }`
+
+  try {
+    const response = await fetch('https://api.linear.app/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ query, variables: { id: issueId } }),
+    })
+
+    const result = (await response.json()) as {
+      data?: {
+        issue?: {
+          attachments?: {
+            nodes?: Array<{
+              title: string
+              url: string
+              metadata?: { messages?: AttachmentMessage[] }
+              source?: { type: string }
+            }>
+          }
+        }
+      }
+    }
+
+    const nodes = result.data?.issue?.attachments?.nodes || []
+
+    return nodes
+      .filter((n) => n.metadata?.messages?.length)
+      .map((n) => ({
+        title: n.title,
+        url: n.url,
+        source: n.source,
+        messages: n.metadata!.messages!,
+      }))
+  } catch (error) {
+    logger.warn('Failed to fetch attachment metadata', { issueId, error })
+    return []
+  }
+}
+
+/**
+ * Format attachment messages for inclusion in the prompt
+ */
+export function formatAttachmentMessagesForPrompt(attachments: AttachmentMetadata[]): string {
+  if (attachments.length === 0) return ''
+
+  const sections: string[] = ['\n---\n## Customer Requests\n']
+
+  for (const att of attachments) {
+    const sourceType = att.source?.type || 'unknown'
+
+    for (const msg of att.messages) {
+      const date = msg.timestamp ? new Date(msg.timestamp).toLocaleDateString() : ''
+      const header = date ? `**${msg.author}** (${sourceType}, ${date}):` : `**${msg.author}** (${sourceType}):`
+      sections.push(header)
+      sections.push(`> ${msg.body.split('\n').join('\n> ')}\n`)
+    }
+  }
+
   return sections.join('\n')
 }

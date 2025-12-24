@@ -9,6 +9,8 @@ import {
   type AgentSessionEvent,
   type LinearClient,
   buildPromptFromSession,
+  fetchAttachmentMetadata,
+  formatAttachmentMessagesForPrompt,
   formatAttachmentsForPrompt,
   prefetchLinearAttachments,
 } from '@sniff/linear'
@@ -158,16 +160,21 @@ export class Coordinator {
         return
       }
 
-      // 5. Pre-fetch Linear attachments if we have an access token
+      // 5. Pre-fetch Linear attachments and metadata if we have an access token
       let attachmentsContext = ''
       if (this.linearAccessToken) {
         try {
+          // Fetch file attachments (PDFs, images, etc.)
           const attachments = await prefetchLinearAttachments(
             event,
             this.linearAccessToken,
             worktreePath,
           )
-          attachmentsContext = formatAttachmentsForPrompt(attachments)
+          attachmentsContext += formatAttachmentsForPrompt(attachments)
+
+          // Fetch attachment metadata (Slack messages, customer requests, etc.)
+          const metadata = await fetchAttachmentMetadata(event.issue.id, this.linearAccessToken)
+          attachmentsContext += formatAttachmentMessagesForPrompt(metadata)
         } catch (error) {
           logger.warn('Failed to pre-fetch attachments', {
             error: error instanceof Error ? error.message : String(error),
