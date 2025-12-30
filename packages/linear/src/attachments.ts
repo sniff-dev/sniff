@@ -46,21 +46,66 @@ export interface RelatedIssue {
   relationType: 'blocks' | 'blockedBy' | 'duplicate' | 'duplicateOf' | 'related'
 }
 
-// Media types that Claude cannot process
-const VIDEO_MIME_PREFIXES = ['video/']
-const AUDIO_MIME_PREFIXES = ['audio/']
-const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm', '.avi', '.mkv', '.mpeg', '.m4v']
-const AUDIO_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac']
+/**
+ * File types that Claude Code's Read tool can process.
+ * Everything else will be skipped with metadata only.
+ *
+ * Supported by Claude Code:
+ * - Images: PNG, JPG, JPEG, GIF, WEBP
+ * - Documents: PDF
+ * - Text: Any plain text file
+ * - Notebooks: Jupyter (.ipynb)
+ */
+const SUPPORTED_MIME_TYPES = [
+  // Images
+  'image/png',
+  'image/jpeg',
+  'image/gif',
+  'image/webp',
+  // Documents
+  'application/pdf',
+  // Text
+  'text/',
+  'application/json',
+  'application/xml',
+  'application/javascript',
+  'application/typescript',
+]
 
-function isUnreadableMedia(contentType: string, filename: string): boolean {
+const SUPPORTED_EXTENSIONS = [
+  // Images
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  // Documents
+  '.pdf',
+  // Notebooks
+  '.ipynb',
+  // Common text files (fallback for when MIME type is missing/wrong)
+  '.txt',
+  '.md',
+  '.json',
+  '.xml',
+  '.yaml',
+  '.yml',
+  '.csv',
+  '.log',
+]
+
+function isReadableByAgent(contentType: string, filename: string): boolean {
   const lowerContentType = contentType.toLowerCase()
-  const mimeMatch =
-    VIDEO_MIME_PREFIXES.some((p) => lowerContentType.startsWith(p)) ||
-    AUDIO_MIME_PREFIXES.some((p) => lowerContentType.startsWith(p))
-  if (mimeMatch) return true
-
   const ext = filename.toLowerCase().match(/\.[^.]+$/)?.[0] || ''
-  return VIDEO_EXTENSIONS.includes(ext) || AUDIO_EXTENSIONS.includes(ext)
+
+  // Check MIME type
+  const mimeSupported = SUPPORTED_MIME_TYPES.some(
+    (t) => lowerContentType.startsWith(t) || lowerContentType === t,
+  )
+  if (mimeSupported) return true
+
+  // Fallback to extension check
+  return SUPPORTED_EXTENSIONS.includes(ext)
 }
 
 function formatFileSize(bytes: number): string {
@@ -79,8 +124,8 @@ export function extractLinearUploadUrls(text: string): string[] {
 
 /**
  * Fetch a single attachment with OAuth authentication
- * All files are saved to the worktree for the agent to read
- * Videos and audio files are skipped since Claude cannot process them
+ * Only downloads files that Claude Code can read (images, PDFs, text)
+ * Unsupported files are skipped with metadata only
  */
 export async function fetchLinearAttachment(
   url: string,
@@ -104,14 +149,14 @@ export async function fetchLinearAttachment(
     const contentLength = headResponse.headers.get('content-length')
     const fileSize = contentLength ? parseInt(contentLength, 10) : undefined
 
-    // Skip video/audio files - Claude cannot process them
-    if (isUnreadableMedia(contentType, filename)) {
+    // Skip unsupported file types - only download what Claude Code can read
+    if (!isReadableByAgent(contentType, filename)) {
       return {
         url,
         success: true,
         contentType,
         skipped: true,
-        skipReason: 'video/audio files cannot be processed by the agent',
+        skipReason: 'file type not supported by agent',
         filename,
         fileSize,
       }
