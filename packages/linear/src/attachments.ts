@@ -132,7 +132,8 @@ export async function fetchLinearAttachment(
   accessToken: string,
   worktreePath: string,
 ): Promise<FetchedAttachment> {
-  const filename = url.split('/').pop() || `attachment-${Date.now()}`
+  const urlObj = new URL(url)
+  const filename = urlObj.pathname.split('/').pop() || `attachment-${Date.now()}`
 
   try {
     // HEAD request first to check content type without downloading
